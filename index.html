@@ -11,6 +11,21 @@
     tailwind.config = {
       theme: {
         extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22'
+            }
+          },
           fontFamily: {
             sans: ['Pretendard', 'sans-serif'],
             brand: ['Montserrat', 'sans-serif']
@@ -22,9 +37,9 @@
   <style>
     body { font-family: 'Pretendard', sans-serif; background-color: #f7faf8; color: #064e3b; }
     .badge-logo {
-      background-color: #064e3b; color: #fff; border-radius: 9999px; display: inline-flex;
-      align-items: center; justify-content: center; letter-spacing: -0.02em; border: 2px solid #047857;
-      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.2);
+      background-color: #34a862; color: #fff; border-radius: 9999px; display: inline-flex;
+      align-items: center; justify-content: center; letter-spacing: -0.02em; border: 2px solid #278b4e;
+      box-shadow: 0 4px 14px rgba(46, 158, 102, 0.25);
     }
     .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -43,37 +58,36 @@
             <span>D</span>
             <span class="relative mx-[0.5px]">
               <span>A</span>
-              <span class="absolute left-1/2 -translate-x-1/2 bottom-[4px] w-[3px] h-[3px] bg-[#064e3b] rounded-full"></span>
+              <span class="absolute left-1/2 -translate-x-1/2 bottom-[4px] w-[3px] h-[3px] bg-[#34a862] rounded-full"></span>
             </span>
             <span>ICLO</span>
-            <span class="text-[9px] sm:text-[11px] ml-1 font-sans font-bold border border-emerald-300 rounded-full w-3.5 h-3.5 flex items-center justify-center text-emerald-200">R</span>
+            <span class="text-[9px] sm:text-[11px] ml-1 font-sans font-bold border border-emerald-300 rounded-full w-3.5 h-3.5 flex items-center justify-center text-emerald-100">R</span>
           </div>
         </button>
         <span class="text-2xl sm:text-3xl font-black text-emerald-900 tracking-tight ml-2">송파헬리오시티점</span>
       </div>
-
     </div>
   </header>
 
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-6 pb-32">
-    <div class="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-emerald-700/40">
-      <!-- 닉네임 조회 영역 우측 상단 집모양 홈 리프레시 버튼 -->
+    <!-- 요청하신 산뜻한 그린 컬러(#34a862) 배경 적용 -->
+    <div class="bg-[#34a862] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-[#2b9454]">
       <button id="manualHomeRefreshBtn" type="button" title="홈 화면으로 초기화 및 새로고침" aria-label="홈 화면으로 초기화 및 새로고침"
-        class="absolute top-4 sm:top-6 right-4 sm:right-6 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-90 text-white border border-white/20 flex items-center justify-center shadow-md backdrop-blur-xs transition-all cursor-pointer">
-        <i data-lucide="home" class="w-5 h-5 text-emerald-100 stroke-[2.2]"></i>
+        class="absolute top-4 sm:top-6 right-4 sm:right-6 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 hover:bg-white/30 active:scale-90 text-white border border-white/25 flex items-center justify-center shadow-md backdrop-blur-xs transition-all cursor-pointer">
+        <i data-lucide="home" class="w-5 h-5 text-white stroke-[2.2]"></i>
       </button>
 
-      <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none select-none font-brand font-black text-8xl text-emerald-300">
+      <div class="absolute -right-6 -bottom-6 opacity-15 pointer-events-none select-none font-brand font-black text-8xl text-white">
         DAICLO
       </div>
 
       <div class="relative z-10 w-full space-y-4">
         <div class="pr-12 sm:pr-14">
           <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex flex-wrap items-baseline gap-2">
-            <span>주문조회 &amp; 픽업 체크</span>
+            <span>주문조회</span>
           </h1>
-          <p class="text-sm text-emerald-100/90 leading-relaxed font-normal mt-1">
-            닉네임을 조회하시면 주문내역을 확인할 수 있습니다. 픽업시 <strong class="text-emerald-300 font-bold">"픽업"</strong> 버튼을 클릭해주세요.
+          <p class="text-sm text-emerald-50 leading-relaxed font-normal mt-1">
+            닉네임을 조회하시면 고객님의 주문내역을 확인하실 수 있습니다.
           </p>
         </div>
 
@@ -84,18 +98,17 @@
                 <i data-lucide="search" class="w-4 h-4 sm:w-4.5 sm:h-4.5"></i>
               </div>
               <input type="text" id="nicknameSearchInput" placeholder="예) 헬리오1234 / 1234" autocomplete="off"
-                class="w-full bg-white text-emerald-950 placeholder:text-emerald-700/45 pl-9 sm:pl-11 pr-9 sm:pr-10 py-3.5 sm:py-4 md:py-4.5 rounded-2xl font-medium text-sm sm:text-base focus:outline-none focus:ring-4 focus:ring-emerald-400/40 shadow-lg">
+                class="w-full bg-white text-emerald-950 placeholder:text-emerald-700/45 pl-9 sm:pl-11 pr-9 sm:pr-10 py-3.5 sm:py-4 md:py-4.5 rounded-2xl font-medium text-sm sm:text-base focus:outline-none focus:ring-4 focus:ring-emerald-200 shadow-lg">
               <button id="clearSearchBtn" type="button" aria-label="검색어 지우기" class="absolute right-3 text-emerald-600 hover:text-emerald-900 hidden p-1 cursor-pointer">
                 <i data-lucide="x" class="w-4 h-4 sm:w-4.5 sm:h-4.5"></i>
               </button>
             </div>
-            <button id="searchNicknameBtn" type="button" class="shrink-0 w-16 sm:w-20 md:w-24 flex items-center justify-center gap-1 sm:gap-1.5 bg-emerald-400 hover:bg-emerald-300 active:scale-95 text-emerald-950 font-extrabold text-sm sm:text-base rounded-2xl shadow-lg cursor-pointer border border-emerald-300 transition-all whitespace-nowrap select-none">
+            <button id="searchNicknameBtn" type="button" class="shrink-0 w-16 sm:w-20 md:w-24 flex items-center justify-center gap-1 sm:gap-1.5 bg-white hover:bg-emerald-50 active:scale-95 text-[#278b4e] font-extrabold text-sm sm:text-base rounded-2xl shadow-lg cursor-pointer border border-white/60 transition-all whitespace-nowrap select-none">
               <i data-lucide="search" class="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.5]"></i>
               <span>조회</span>
             </button>
           </div>
 
-          <!-- 심플하고 정돈된 닉네임 선택/표시 영역 -->
           <div id="matchingChipsContainer" class="hidden pt-1 transition-all">
             <div id="nicknameChipList" class="w-full"></div>
           </div>
@@ -103,48 +116,45 @@
       </div>
     </div>
 
-    <div class="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 rounded-3xl border border-emerald-700/50 shadow-xl overflow-hidden min-h-[300px]">
+    <!-- 하단 주문목록 컨테이너도 동일한 배경색(#34a862)으로 일치 적용 -->
+    <div class="bg-[#34a862] rounded-3xl border border-[#2b9454] shadow-xl overflow-hidden min-h-[300px]">
       <div id="ordersListContainer" class="p-4 sm:p-6 space-y-5"></div>
 
-      <div id="initialStatePrompt" class="p-10 sm:p-16 text-center text-emerald-100 flex flex-col items-center justify-center h-full">
-        <div class="w-16 h-16 bg-emerald-800/60 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-300 border border-emerald-600/50">
+      <div id="initialStatePrompt" class="p-10 sm:p-16 text-center text-emerald-50 flex flex-col items-center justify-center h-full">
+        <div class="w-16 h-16 bg-white/15 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white border border-white/20">
           <i data-lucide="user-search" class="w-8 h-8"></i>
         </div>
-        <h3 id="initialPromptTitle" class="text-base sm:text-lg font-bold text-white">주문조회 &amp; 픽업 체크</h3>
-        <p id="initialPromptDesc" class="text-xs sm:text-sm text-emerald-200 mt-2 max-w-md mx-auto leading-relaxed">
+        <h3 id="initialPromptTitle" class="text-base sm:text-lg font-bold text-white">주문조회</h3>
+        <p id="initialPromptDesc" class="text-xs sm:text-sm text-emerald-50/90 mt-2 max-w-md mx-auto leading-relaxed">
           상단 검색창에 닉네임을 입력 후 <strong>[조회]</strong>를 누르면 주문 내역이 표시됩니다.
         </p>
       </div>
 
-      <div id="emptyResultsState" class="hidden p-10 sm:p-16 text-center text-emerald-100 flex flex-col items-center justify-center h-full">
-        <div class="w-16 h-16 bg-rose-900/40 rounded-2xl flex items-center justify-center mx-auto mb-4 text-rose-300 border border-rose-800/50">
+      <div id="emptyResultsState" class="hidden p-10 sm:p-16 text-center text-emerald-50 flex flex-col items-center justify-center h-full">
+        <div class="w-16 h-16 bg-rose-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-rose-200 border border-rose-800/40">
           <i data-lucide="search-x" class="w-8 h-8"></i>
         </div>
         <h3 class="text-base sm:text-lg font-bold text-white">일치하는 닉네임이 없습니다</h3>
-        <p class="text-xs sm:text-sm text-emerald-200 mt-2">주문하신 닉네임으로 다시 입력해주세요</p>
-        <button id="resetAllFiltersBtn" type="button" class="mt-5 px-5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer">
+        <p class="text-xs sm:text-sm text-emerald-50 mt-2">주문하신 닉네임으로 다시 입력해주세요</p>
+        <button id="resetAllFiltersBtn" type="button" class="mt-5 px-5 py-2 bg-emerald-900 hover:bg-emerald-950 text-white rounded-xl text-xs font-bold transition-all cursor-pointer">
           초기화
         </button>
       </div>
     </div>
   </main>
 
-  <!-- 토스트 알림 -->
   <div id="toastNotification" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl text-white text-sm font-semibold whitespace-nowrap">
     <div id="toastIcon"></div>
     <span id="toastMessage"></span>
   </div>
 
-  <!-- 화면 왼쪽 하단: 갱신 시각 및 컨트롤 버튼 바 -->
   <div class="fixed bottom-4 sm:bottom-6 left-4 sm:left-6 z-40 flex flex-wrap items-center gap-2 sm:gap-2.5 select-none pointer-events-auto max-w-[calc(100vw-2rem)]">
-    <!-- 갱신 시각 표시 뱃지 -->
     <button id="systemSyncBtn" type="button" class="px-3.5 py-2.5 bg-white/95 backdrop-blur-md border border-emerald-200/80 rounded-2xl shadow-sm text-emerald-800 hover:bg-emerald-50 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold">
       <i data-lucide="refresh-ccw" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600"></i>
       <span class="tracking-tight">DB UPDATE</span>
     </button>
   </div>
 
-  <!-- 비밀번호 입력 모달 -->
   <div id="passwordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300 p-8 text-center" id="passwordModalContent">
       <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -162,7 +172,6 @@
     </div>
   </div>
 
-  <!-- 히스토리 내역 모달 -->
   <div id="historyModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[88vh] flex flex-col transform scale-95 transition-transform duration-300 border border-emerald-100" id="historyModalContent">
       <div class="p-5 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-3xl">
@@ -181,14 +190,11 @@
       </div>
       
       <div class="p-4 sm:p-6 overflow-y-auto flex-1 custom-scroll bg-slate-50/60 rounded-b-3xl">
-        <div id="historyListContainer" class="space-y-3.5">
-          <!-- 히스토리 렌더링 영역 -->
-        </div>
+        <div id="historyListContainer" class="space-y-3.5"></div>
       </div>
     </div>
   </div>
 
-  <!-- 커스텀 안내 팝업(Alert 대체 모달) -->
   <div id="customAlertModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300 p-8 text-center border border-emerald-100" id="customAlertContent">
       <div class="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-rose-100">
@@ -203,7 +209,6 @@
     </div>
   </div>
 
-  <!-- 커스텀 확인 팝업(Confirm 대체 모달) -->
   <div id="customConfirmModal" class="fixed inset-0 z-[65] flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300 p-8 text-center border border-emerald-100" id="customConfirmContent">
       <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-100">
@@ -222,29 +227,26 @@
     </div>
   </div>
 
-  <!-- Apps Script 백그라운드 완벽 실행용 숨김 아이프레임 -->
   <iframe id="appsScriptHiddenTarget" name="appsScriptHiddenTarget" style="display:none; width:0; height:0; border:0;"></iframe>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     let ordersData = [];
     let searchQuery = "";
     let activeSelectedNickname = "";
     let multiNicknameChoices = [];
-    let adminPassword = "0718"; // 구글 시트 '설정' 탭 동기화 전 기본 비밀번호
+    let adminPassword = "0718";
 
     const SHEET_ID = "11OG6u2i64D6exMiBgqGbkq-wrmxrYrVfLSzbYsBoXC8";
     const APPS_SCRIPT_SYNC_URL = "https://script.google.com/macros/s/AKfycbyvRsB4cUdnC0DgFz4TJcgmN7_YCf-4dO0MG4SMP0JsDb5BNLZLEY1bPxpA2YKuboAC/exec";
 
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'daiclo-order-sync';
     let db = null;
     let auth = null;
     let currentUser = null;
 
-    // 미리보기 및 네트워크 지연 대비 샘플 데이터
     const SAMPLE_INITIAL_ORDERS = [
       { id: 'ORD-2', sheetRowIndex: 2, orderDate: '2026.09.08', pickupDate: '2026.09.11', nickname: '헬리오1234', productName: 'DAICLO 프리미엄 에어로 쿨링 셔츠', quantity: 2, amount: 58000, status: '픽업예정' },
       { id: 'ORD-3', sheetRowIndex: 3, orderDate: '2026.09.09', pickupDate: '2026.09.11', nickname: '헬리오1234', productName: 'DAICLO 컴포트 슬랙스 네이비 (L)', quantity: 1, amount: 39000, status: '픽업예정' },
@@ -306,26 +308,24 @@
       
       chipContainer.innerHTML = "";
 
-      // 1) 닉네임이 최종 선택된 경우: 심플하고 세련된 단일 인포 바 형태로 표시
       if (activeSelectedNickname) {
         container.classList.remove("hidden");
         const count = ordersData.filter(o => (o.nickname || "").toLowerCase() === activeSelectedNickname.toLowerCase()).length;
 
         const selectedBadge = document.createElement("div");
-        selectedBadge.className = "inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 backdrop-blur-md border border-emerald-300/30 pl-3 pr-2 py-1.5 rounded-full shadow-sm transition-all text-white animate-in fade-in duration-200";
+        selectedBadge.className = "inline-flex items-center gap-2.5 bg-white text-slate-900 pl-3.5 pr-2 py-1.5 sm:py-2 rounded-full shadow-lg border border-emerald-100 transition-all animate-in fade-in duration-200";
         selectedBadge.innerHTML = `
-          <div class="w-5 h-5 rounded-full bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0">
-            <i data-lucide="check" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+          <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+            <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
           </div>
-          <span class="text-xs font-semibold text-emerald-200/90 select-none">선택 회원</span>
-          <span class="text-sm font-extrabold text-white tracking-tight">${escapeHtml(activeSelectedNickname)}</span>
-          <span class="text-[11px] font-bold font-mono bg-emerald-950/60 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-600/40">${count}건</span>
-          <button type="button" id="deselectNicknameBtn" title="선택 해제 및 목록 다시보기" aria-label="선택 해제" class="ml-0.5 w-6 h-6 rounded-full hover:bg-white/20 active:scale-90 flex items-center justify-center text-emerald-200 hover:text-white transition-all cursor-pointer">
-            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          <span class="text-xs font-bold text-emerald-800 select-none">선택 회원</span>
+          <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight">${escapeHtml(activeSelectedNickname)}</span>
+          <span class="text-xs font-black font-mono bg-emerald-600 text-white px-2.5 py-0.5 rounded-full shadow-xs">${count}건</span>
+          <button type="button" id="deselectNicknameBtn" title="선택 해제 및 목록 다시보기" aria-label="선택 해제" class="ml-1 w-6 h-6 rounded-full hover:bg-slate-100 active:scale-90 flex items-center justify-center text-slate-400 hover:text-slate-800 transition-all cursor-pointer">
+            <i data-lucide="x" class="w-4 h-4 stroke-[2.5]"></i>
           </button>
         `;
 
-        // X 버튼 누르면 선택 해제 후 후보 목록으로 복귀
         const deselectBtn = selectedBadge.querySelector("#deselectNicknameBtn");
         if (deselectBtn) {
           deselectBtn.addEventListener("click", (e) => {
@@ -344,24 +344,21 @@
         return;
       }
 
-      // 2) 검색 결과 복수 후보 목록이 있을 경우: 닉네임 선택 라벨 아래부터 정렬
       if (multiNicknameChoices && multiNicknameChoices.length > 0) {
         container.classList.remove("hidden");
 
         const wrapper = document.createElement("div");
         wrapper.className = "flex flex-col gap-2 w-full";
 
-        // 상단 안내 라벨 행
         const labelRow = document.createElement("div");
-        labelRow.className = "flex items-center gap-1.5 text-xs text-emerald-200/90 font-bold select-none";
+        labelRow.className = "flex items-center gap-1.5 text-xs text-emerald-100 font-bold select-none";
         labelRow.innerHTML = `
-          <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-300"></i>
-          <span>닉네임 선택</span>
-          <span class="text-[11px] font-mono font-bold text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-700/50">${multiNicknameChoices.length}건 검색됨</span>
+          <i data-lucide="user" class="w-3.5 h-3.5 text-white"></i>
+          <span class="text-white font-extrabold">닉네임 선택</span>
+          <span class="text-[11px] font-mono font-bold text-emerald-950 bg-emerald-100 px-2 py-0.5 rounded-full">${multiNicknameChoices.length}건 검색됨</span>
         `;
         wrapper.appendChild(labelRow);
 
-        // 라벨 아래부터 나열되는 닉네임 버튼 목록 영역 (스크롤 없이 전체 노출)
         const chipsList = document.createElement("div");
         chipsList.className = "flex flex-wrap items-center gap-2 py-0.5";
 
@@ -369,10 +366,10 @@
           const count = ordersData.filter(o => (o.nickname || "").toLowerCase() === nick.toLowerCase()).length;
           const chip = document.createElement("button");
           chip.type = "button";
-          chip.className = "text-xs px-3 py-1.5 rounded-full font-medium bg-white/15 hover:bg-white/25 active:scale-95 text-white backdrop-blur-xs border border-white/20 shadow-xs transition-all flex items-center gap-1.5 cursor-pointer";
+          chip.className = "text-xs sm:text-sm px-3.5 py-1.5 rounded-full font-bold bg-white text-slate-800 hover:bg-emerald-50 active:scale-95 shadow-md border border-white transition-all flex items-center gap-2 cursor-pointer";
           chip.innerHTML = `
-            <span class="truncate max-w-[140px] font-bold text-xs sm:text-sm">${escapeHtml(nick)}</span>
-            <span class="text-[10px] bg-black/30 text-emerald-200 px-1.5 py-0.2 rounded-full font-mono font-bold">${count}건</span>
+            <span class="truncate max-w-[140px] text-slate-900 font-extrabold">${escapeHtml(nick)}</span>
+            <span class="text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-mono font-bold">${count}건</span>
           `;
           chip.addEventListener("click", () => selectNickname(nick));
           chipsList.appendChild(chip);
@@ -385,7 +382,6 @@
         return;
       }
 
-      // 표시할 내역이 없는 경우
       container.classList.add("hidden");
     }
 
@@ -458,75 +454,68 @@
       }
       empty.classList.add("hidden");
 
+      // 날짜 문자열(예: '2026. 9. 9', '2026.09.09')을 타임스탬프로 안전하게 변환
+      const parseDateToTime = (dateStr) => {
+        const parts = String(dateStr || "").match(/\d+/g);
+        if (!parts || parts.length < 3) return 0;
+        return new Date(parts[0], parseInt(parts[1], 10) - 1, parts[2]).getTime() || 0;
+      };
+
+      // 1순위: '픽업 전' 주문 우선 배치, '픽업 완료'는 아래로
+      // 2순위: 주문일자 최신순(내림차순)
+      // 3순위: 동일 날짜의 경우 최신 행(row) 순서
       filtered.sort((a, b) => {
-        const timeA = new Date(String(a.orderDate).replace(/\./g, '-')).getTime() || 0;
-        const timeB = new Date(String(b.orderDate).replace(/\./g, '-')).getTime() || 0;
-        return timeB !== timeA ? timeB - timeA : (b.sheetRowIndex || 0) - (a.sheetRowIndex || 0);
+        const isCompleteA = a.status === "완료" || a.status === "1";
+        const isCompleteB = b.status === "완료" || b.status === "1";
+
+        if (isCompleteA !== isCompleteB) {
+          return isCompleteA ? 1 : -1;
+        }
+
+        const timeA = parseDateToTime(a.orderDate);
+        const timeB = parseDateToTime(b.orderDate);
+        if (timeB !== timeA) return timeB - timeA;
+
+        return (b.sheetRowIndex || 0) - (a.sheetRowIndex || 0);
       });
 
       filtered.forEach((order) => {
         const isComplete = order.status === "완료" || order.status === "1";
 
         const itemCard = document.createElement("div");
-        itemCard.className = `rounded-2xl transition-all p-3 sm:p-4.5 flex flex-col gap-2 sm:gap-2.5 ${isComplete ? 'bg-emerald-50/95 border border-emerald-200 opacity-85' : 'bg-white border-2 border-emerald-200/80 shadow-sm hover:border-emerald-400'}`;
+        itemCard.className = `rounded-2xl transition-all px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-3 sm:gap-4 ${
+          isComplete 
+            ? 'bg-emerald-950/20 backdrop-blur-xs border border-emerald-900/30 text-emerald-950/70 shadow-inner' 
+            : 'bg-white border border-emerald-200/90 shadow-xs hover:border-emerald-400 text-black'
+        }`;
 
-        const completedTimeText = order.completedAt || order.processedTime || "";
         const unitPrice = order.unitPrice || (order.quantity > 0 ? Math.round(order.amount / order.quantity) : order.amount);
 
         itemCard.innerHTML = `
-          <!-- 1번째 라인: [품목명] / [단가] / [수량] / [합계] ... 우측 [픽업 / 완료 버튼] -->
-          <div class="flex items-center justify-between gap-2 min-w-0">
-            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 text-sm sm:text-lg md:text-xl text-black font-bold">
-              <!-- 품목명 -->
-              <span class="truncate text-black" title="${escapeHtml(order.productName || '상품명 없음')}">
-                ${escapeHtml(order.productName || "상품명 없음")}
-              </span>
-
-              <!-- 단가 / 수량 / 합계 인라인 표시 (품목명과 동일한 크기 및 검은색 글자) -->
-              <div class="inline-flex items-center gap-1 sm:gap-1.5 shrink-0 text-black">
-                <span class="text-black select-none font-normal">/</span>
-                <span class="whitespace-nowrap text-black">${Number(unitPrice).toLocaleString()}원</span>
-                <span class="text-black select-none font-normal">/</span>
-                <span class="whitespace-nowrap text-black">${order.quantity}개</span>
-                <span class="text-black select-none font-normal">/</span>
-                <span class="whitespace-nowrap text-black">${Number(order.amount).toLocaleString()}원</span>
-              </div>
-            </div>
-
-            <!-- 우측 액션 버튼 (픽업 / 완료) -->
-            <div class="shrink-0 flex items-center justify-end ml-1">
-              ${isComplete 
-                ? `
-                  <div class="px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg text-[11px] sm:text-xs font-bold flex items-center gap-1 bg-brand-100 text-brand-900 border border-brand-300 shadow-2xs">
-                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-700"></i>
-                    <span>완료</span>
-                  </div>
-                `
-                : `<button type="button" onclick="window.processPickup('${order.id}')" class="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1 shadow-2xs border border-brand-500 bg-white text-brand-800 hover:bg-brand-50 active:scale-95 cursor-pointer"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-600 stroke-[2.5]"></i><span>픽업</span></button>`
-              }
-            </div>
+          <!-- 좌측: 품목 / 단가 / 수량 / 가격 -->
+          <div class="min-w-0 flex-1 flex items-center flex-wrap gap-1.5 sm:gap-2.5 text-xs sm:text-sm md:text-base font-bold ${isComplete ? 'text-emerald-950/75' : 'text-black'}">
+            <span class="truncate max-w-[200px] sm:max-w-xs md:max-w-md font-bold text-sm sm:text-base md:text-lg ${isComplete ? 'text-emerald-950/80' : 'text-black'}" title="${escapeHtml(order.productName || '상품명 없음')}">
+              ${escapeHtml(order.productName || "상품명 없음")}
+            </span>
+            <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
+            <span class="whitespace-nowrap">${Number(unitPrice).toLocaleString()}원</span>
+            <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
+            <span class="whitespace-nowrap">${order.quantity}개</span>
+            <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
+            <span class="${isComplete ? 'text-emerald-950/85' : 'text-emerald-950'} font-extrabold whitespace-nowrap">${Number(order.amount).toLocaleString()}원</span>
+            ${isComplete 
+              ? `<span class="ml-1 text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-lg bg-emerald-950/15 text-emerald-950/80 border border-emerald-900/20 shadow-inner whitespace-nowrap inline-flex items-center gap-1">
+                   <i data-lucide="check" class="w-3 h-3 stroke-[2.5] text-emerald-900/70"></i>
+                   <span>픽업 완료</span>
+                 </span>` 
+              : `<span class="ml-1 text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">아직 픽업 전이예요</span>`
+            }
           </div>
 
-          <!-- 하단 라인: 주문일자 / 픽업예정일자 및 우측 일자/시각 (구분선 없이 자연스러운 간격 배치) -->
-          <div class="flex items-center justify-between gap-2 pt-0.5 sm:pt-1 text-xs sm:text-sm md:text-base text-brand-900 font-normal">
-            <div class="flex items-center gap-2 sm:gap-2.5 shrink-0 text-brand-900">
-              <div class="inline-flex items-center gap-1 text-brand-900">
-                <span class="text-brand-900">주문 :</span>
-                <span class="text-brand-900 whitespace-nowrap">${escapeHtml(order.orderDate || "-")}</span>
-              </div>
-              <span class="text-brand-700/60 select-none">|</span>
-              <div class="inline-flex items-center gap-1 text-brand-900">
-                <span class="text-brand-900">픽업예정 :</span>
-                <span class="text-brand-900 whitespace-nowrap">${escapeHtml(order.pickupDate || "-")}</span>
-              </div>
-            </div>
-
-            <!-- 완료 시각 (동일한 일반 굵기) -->
-            ${isComplete && completedTimeText ? `
-              <div class="font-normal text-brand-900 shrink-0 select-all tracking-tight text-right text-xs sm:text-sm md:text-base">
-                ${escapeHtml(completedTimeText)}
-              </div>
-            ` : ''}
+          <!-- 우측 끝: 주문일자 & 픽업예정일 -->
+          <div class="shrink-0 flex items-center gap-2 sm:gap-3 text-xs sm:text-sm font-medium ${isComplete ? 'text-emerald-950/65' : 'text-emerald-900'} whitespace-nowrap">
+            <span>주문일자: ${escapeHtml(order.orderDate || "-")}</span>
+            <span>픽업예정: ${escapeHtml(order.pickupDate || "-")}</span>
           </div>
         `;
         container.appendChild(itemCard);
@@ -539,7 +528,6 @@
       renderOrders();
     }
 
-    // 픽업완료 처리: 화면 반영 + Apps Script를 통해 주문데이터 H열에 "완료" 기록
     window.processPickup = function(orderId) {
       const order = ordersData.find(o => o.id === orderId);
       if (!order) {
@@ -547,21 +535,17 @@
         return;
       }
 
-      // 중복 클릭 방지
       if (order._processing) return;
       order._processing = true;
 
-      // 일자 및 시각 포맷 생성 (예: 2026.09.12 22:49:05)
       const now = new Date();
       const pad = (n) => String(n).padStart(2, "0");
       const formattedTimestamp = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
-      // 1. 화면 즉시 완료 및 일자/시각 반영
       order.status = "완료";
       order.completedAt = formattedTimestamp;
       order.processedTime = formattedTimestamp;
 
-      // 로컬 스토리지에 캐싱하여 새로고침 시에도 일자/시각 보존
       try {
         localStorage.setItem(`daiclo_completed_${order.id}`, formattedTimestamp);
         if (order.sheetRowIndex) {
@@ -571,7 +555,6 @@
 
       render();
 
-      // 2. Apps Script의 testDirect() 함수를 명시적으로 실행하도록 파라미터 구성
       const callbackName = "cb_as_" + Date.now();
       window[callbackName] = function(res) {
         delete window[callbackName];
@@ -579,29 +562,19 @@
         showToast(`[${order.nickname}] 시트 업데이트 완료 (${formattedTimestamp})`, "success");
       };
 
-      // 1) test 탭 등록 기능 삭제
-      // 2) 주문데이터탭 H열("완료") 및 I열(픽업버튼 누른 시각) 동시 등록 전송 규격
       const payload = {
         action: 'updatePickup',
         method: 'updatePickup',
-        functionName: 'testDirect', // 기존 Apps Script 배포 함수와의 하위 호환성 유지
+        functionName: 'testDirect',
         callback: callbackName,
-
-        // 대상 시트 지정: 오직 '주문데이터' 탭만 대상으로 처리 (test 탭 제외)
         sheetName: '주문데이터',
         targetSheet: '주문데이터',
-
-        // 행 번호
         sheetRowIndex: String(order.sheetRowIndex || ''),
         row: String(order.sheetRowIndex || ''),
-
-        // H열(8번째 컬럼): '완료' 상태
         col: '8',
         statusCol: 'H',
         status: '완료',
         newStatus: '완료',
-
-        // I열(9번째 컬럼): 픽업버튼 누른 시각
         timeCol: '9',
         pickupTimeCol: 'I',
         timeColLetter: 'I',
@@ -609,8 +582,6 @@
         pickupCheckTime: formattedTimestamp,
         time: formattedTimestamp,
         processedTime: formattedTimestamp,
-
-        // 기타 주문 식별 정보
         orderId: String(order.id || ''),
         nickname: String(order.nickname || ''),
         _t: String(Date.now())
@@ -620,7 +591,6 @@
         const queryParams = new URLSearchParams(payload).toString();
         const targetUrl = APPS_SCRIPT_SYNC_URL + (APPS_SCRIPT_SYNC_URL.includes('?') ? '&' : '?') + queryParams;
 
-        // 1순위: JSONP 방식의 Script Tag 동적 주입
         try {
           const sTag = document.createElement('script');
           sTag.src = targetUrl;
@@ -632,7 +602,6 @@
           document.body.appendChild(sTag);
         } catch (_) {}
 
-        // 2순위: fetch with mode: 'no-cors' 및 keepalive
         fetch(targetUrl, {
           method: 'GET',
           mode: 'no-cors',
@@ -640,18 +609,15 @@
           keepalive: true
         }).catch(() => {});
 
-        // 3순위: 이미지 비콘
         const beaconImg = new Image();
         beaconImg.src = targetUrl;
 
-        // 4순위: 숨김 iframe src
         const hiddenIframe = document.getElementById('appsScriptHiddenTarget');
         if (hiddenIframe) {
           hiddenIframe.src = targetUrl;
         }
 
         showToast(`[${order.nickname}] 완료 처리됨 (${formattedTimestamp})`, 'success');
-        console.log('Apps Script 요청 발송 URL:', targetUrl);
       } catch (e) {
         console.error('Apps Script 호출 실패:', e);
         showToast(`[${order.nickname}] 전송 오류 발생`, 'error');
@@ -666,7 +632,6 @@
     function processRawMatrix(matrix) {
       if (!matrix || matrix.length === 0) return [];
       
-      // 헤더 행 자동 탐지
       let headerRowIndex = -1;
       for (let i = 0; i < Math.min(matrix.length, 5); i++) {
         const rowStr = (matrix[i] || []).join("");
@@ -676,14 +641,14 @@
         }
       }
 
-      let colOrderDate = 0;   // A열: 주문일자
-      let colPickupDate = 1;  // B열: 픽업일자
-      let colNickname = 2;    // C열: 닉네임
-      let colProduct = 3;     // D열: 상품명
-      let colQty = 4;         // E열: 수량
-      let colAmount = 6;      // G열/F열: 금액
-      let colStatus = 7;      // H열: 픽업상태
-      let colTimestampIdx = 8; // I열: 픽업체크시각 기본값 (0-indexed 8번)
+      let colOrderDate = 0;
+      let colPickupDate = 1;
+      let colNickname = 2;
+      let colProduct = 3;
+      let colQty = 4;
+      let colAmount = 6;
+      let colStatus = 7;
+      let colTimestampIdx = 8;
 
       if (headerRowIndex >= 0) {
         const headers = matrix[headerRowIndex].map(h => String(h || "").trim());
@@ -709,11 +674,9 @@
         const nickname = (row[colNickname] !== undefined ? row[colNickname] : row[2] || "").toString().trim();
         if (!nickname) continue;
 
-        // 주문상태(H열)의 현재 값 판별
         const statusRaw = (row[colStatus] !== undefined ? row[colStatus] : row[7] || "").toString().trim();
         const status = (statusRaw === "완료" || statusRaw.includes("완료") || statusRaw === "1") ? "완료" : "픽업예정";
 
-        // 구글 시트의 실제 행 번호: gviz의 data.table.rows는 1행(헤더)을 제외한 2행부터 시작하므로 (i + 2)행입니다.
         const sheetRow = i + 2;
         const orderId = `ORD-${sheetRow}`;
         let savedTimestamp = "";
@@ -722,7 +685,6 @@
                            localStorage.getItem(`daiclo_completed_row_${sheetRow}`) || "";
         } catch (_) {}
 
-        // I열(9번째 열 / 0-indexed 8번)에 기록된 픽업체크시각 확인
         const colTimestamp = (row[colTimestampIdx] !== undefined ? row[colTimestampIdx] : (row[8] || "")).toString().trim();
         const finalTimestamp = colTimestamp || savedTimestamp || null;
 
@@ -743,7 +705,6 @@
       return results;
     }
 
-    // 구글 스프레드시트 '설정' 탭에서 관리자 비밀번호 동적 로드
     function loadSettingsSheetData() {
       const callbackName = "cb_settings_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
       const script = document.createElement("script");
@@ -760,17 +721,14 @@
             
             let foundPassword = "";
 
-            // '비밀번호', '패스워드', 'password' 항목 탐색 (가로/세로 배치 모두 지원)
             for (let r = 0; r < matrix.length; r++) {
               for (let c = 0; c < matrix[r].length; c++) {
                 const cellVal = String(matrix[r][c] || "").trim();
                 if (cellVal.includes("비밀번호") || cellVal.toLowerCase().includes("password") || cellVal.includes("패스워드")) {
-                  // 1. 같은 행 오른쪽 셀(B열 등) 확인
                   if (matrix[r][c + 1] !== undefined && String(matrix[r][c + 1]).trim() !== "") {
                     foundPassword = String(matrix[r][c + 1]).trim();
                     break;
                   }
-                  // 2. 아래 행 같은 열(2행 등) 확인
                   if (r + 1 < matrix.length && matrix[r + 1][c] !== undefined && String(matrix[r + 1][c]).trim() !== "") {
                     foundPassword = String(matrix[r + 1][c]).trim();
                     break;
@@ -780,7 +738,6 @@
               if (foundPassword) break;
             }
 
-            // 레이블 없이 단순 값만 존재하는 경우(예: A2 또는 B1)
             if (!foundPassword && matrix.length > 0) {
               if (matrix.length > 1 && matrix[1][0] !== undefined && String(matrix[1][0]).trim() !== "") {
                 foundPassword = String(matrix[1][0]).trim();
@@ -854,7 +811,6 @@
         }
       };
 
-      // 타임아웃 발생 시 로컬 샘플 데이터로 복구 보장
       timeoutHandler = setTimeout(() => {
         if (window[callbackName]) {
           delete window[callbackName];
@@ -875,11 +831,9 @@
         }
       }, 3500);
 
-      // 구글 스프레드시트의 '주문데이터' 탭을 명시적으로 호출
       script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent("주문데이터")}&tqx=responseHandler:${callbackName}`;
       script.onerror = () => {
         if (timeoutHandler) clearTimeout(timeoutHandler);
-        // '주문데이터' 탭 이름 로드 실패 시 기본 첫 번째 시트로 fallback 재시도
         const fallbackScript = document.createElement("script");
         fallbackScript.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:${callbackName}`;
         document.body.appendChild(fallbackScript);
@@ -890,23 +844,19 @@
     document.addEventListener("DOMContentLoaded", () => {
       ordersData = [...SAMPLE_INITIAL_ORDERS];
       
-      // 실시간 클라우드 공유 및 구글 시트 초기화
       initCloudSync();
       loadSettingsSheetData();
       loadGoogleSheetData(false);
 
-      // 홈 화면 리프레시 함수 (초기화 및 데이터 동기화)
       function resetToHomeScreen(isManual = false) {
         clearSelectedNickname();
         
-        // 열려 있는 모달 닫기
         if (typeof togglePwModal === "function") togglePwModal(false);
         const customAlertModal = document.getElementById("customAlertModal");
         if (customAlertModal) customAlertModal.classList.add("opacity-0", "pointer-events-none");
         const customConfirmModal = document.getElementById("customConfirmModal");
         if (customConfirmModal) customConfirmModal.classList.add("opacity-0", "pointer-events-none");
 
-        // 백그라운드 데이터 동기화 (주문데이터, 관리자설정)
         loadSettingsSheetData();
         loadGoogleSheetData(true);
 
@@ -915,7 +865,6 @@
         }
       }
 
-      // 홈 리프레시 버튼 클릭 이벤트 (수동)
       const manualHomeRefreshBtn = document.getElementById("manualHomeRefreshBtn");
       if (manualHomeRefreshBtn) {
         manualHomeRefreshBtn.addEventListener("click", () => {
@@ -923,7 +872,6 @@
         });
       }
 
-      // 상단 DAICLO 로고 클릭 시에도 홈 화면 리프레시 동일 실행
       const headerLogoBtn = document.getElementById("headerLogoBtn");
       if (headerLogoBtn) {
         headerLogoBtn.addEventListener("click", () => {
@@ -931,7 +879,6 @@
         });
       }
 
-      // 10분(600,000ms)마다 자동으로 홈버튼 클릭 (화면 초기화 및 데이터 최신화)
       const AUTO_HOME_REFRESH_INTERVAL = 10 * 60 * 1000;
       setInterval(() => {
         const homeBtn = document.getElementById("manualHomeRefreshBtn");
@@ -942,7 +889,6 @@
         }
       }, AUTO_HOME_REFRESH_INTERVAL);
 
-      // 커스텀 안내 팝업(Alert 대체) 로직
       const customAlertModal = document.getElementById("customAlertModal");
       const customAlertContent = document.getElementById("customAlertContent");
       const customAlertMessage = document.getElementById("customAlertMessage");
@@ -995,7 +941,6 @@
         });
       }
 
-      // 검색 제어
       const searchBtn = document.getElementById("searchNicknameBtn");
       const searchInput = document.getElementById("nicknameSearchInput");
       const clearBtn = document.getElementById("clearSearchBtn");
@@ -1011,7 +956,6 @@
       if (clearBtn) clearBtn.addEventListener("click", clearSelectedNickname);
       if (resetBtn) resetBtn.addEventListener("click", clearSelectedNickname);
 
-      // 비밀번호 모달 제어 (기본 비밀번호: 0718)
       const pwModal = document.getElementById("passwordModal");
       const pwContent = document.getElementById("passwordModalContent");
       const pwInput = document.getElementById("adminPasswordInput");
