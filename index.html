@@ -35,16 +35,22 @@
     }
   </script>
   <style>
-    body { font-family: 'Pretendard', sans-serif; background-color: #f7faf8; color: #064e3b; }
+    body { font-family: 'Pretendard', sans-serif; background-color: #f7faf8; color: #064e3b; overflow-x: hidden; }
     .badge-logo {
       background-color: #34a862; color: #fff; border-radius: 9999px; display: inline-flex;
       align-items: center; justify-content: center; letter-spacing: -0.02em; border: 2px solid #278b4e;
       box-shadow: 0 4px 14px rgba(46, 158, 102, 0.25);
     }
-    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 9999px; }
-    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #6ee7b7; }
+    /* 전역 및 컨테이너 스크롤바 완전 삭제 (터치 및 마우스 휠 동작은 정상 유지) */
+    * {
+      -ms-overflow-style: none; /* IE, Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+    *::-webkit-scrollbar {
+      display: none !important;
+      width: 0px !important;
+      height: 0px !important;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-[#f7faf8] flex flex-col selection:bg-emerald-200 selection:text-emerald-900">
@@ -87,7 +93,7 @@
             <span>주문조회</span>
           </h1>
           <p class="text-sm text-emerald-50 leading-relaxed font-normal mt-1">
-            닉네임을 조회하시면 고객님의 주문내역을 확인하실 수 있습니다.
+            주문하신 닉네임으로 주문내역을 조회하세요
           </p>
         </div>
 
@@ -121,13 +127,9 @@
       <div id="ordersListContainer" class="p-4 sm:p-6 space-y-5"></div>
 
       <div id="initialStatePrompt" class="p-10 sm:p-16 text-center text-emerald-50 flex flex-col items-center justify-center h-full">
-        <div class="w-16 h-16 bg-white/15 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white border border-white/20">
+        <div class="w-16 h-16 bg-white/15 rounded-2xl flex items-center justify-center mx-auto text-white border border-white/20">
           <i data-lucide="user-search" class="w-8 h-8"></i>
         </div>
-        <h3 id="initialPromptTitle" class="text-base sm:text-lg font-bold text-white">주문조회</h3>
-        <p id="initialPromptDesc" class="text-xs sm:text-sm text-emerald-50/90 mt-2 max-w-md mx-auto leading-relaxed">
-          상단 검색창에 닉네임을 입력 후 <strong>[조회]</strong>를 누르면 주문 내역이 표시됩니다.
-        </p>
       </div>
 
       <div id="emptyResultsState" class="hidden p-10 sm:p-16 text-center text-emerald-50 flex flex-col items-center justify-center h-full">
@@ -310,7 +312,6 @@
 
       if (activeSelectedNickname) {
         container.classList.remove("hidden");
-        const count = ordersData.filter(o => (o.nickname || "").toLowerCase() === activeSelectedNickname.toLowerCase()).length;
 
         const selectedBadge = document.createElement("div");
         selectedBadge.className = "inline-flex items-center gap-2.5 bg-white text-slate-900 pl-3.5 pr-2 py-1.5 sm:py-2 rounded-full shadow-lg border border-emerald-100 transition-all animate-in fade-in duration-200";
@@ -320,7 +321,6 @@
           </div>
           <span class="text-xs font-bold text-emerald-800 select-none">선택 회원</span>
           <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight">${escapeHtml(activeSelectedNickname)}</span>
-          <span class="text-xs font-black font-mono bg-emerald-600 text-white px-2.5 py-0.5 rounded-full shadow-xs">${count}건</span>
           <button type="button" id="deselectNicknameBtn" title="선택 해제 및 목록 다시보기" aria-label="선택 해제" class="ml-1 w-6 h-6 rounded-full hover:bg-slate-100 active:scale-90 flex items-center justify-center text-slate-400 hover:text-slate-800 transition-all cursor-pointer">
             <i data-lucide="x" class="w-4 h-4 stroke-[2.5]"></i>
           </button>
@@ -348,28 +348,26 @@
         container.classList.remove("hidden");
 
         const wrapper = document.createElement("div");
-        wrapper.className = "flex flex-col gap-2 w-full";
+        wrapper.className = "flex flex-col gap-2.5 w-full";
 
         const labelRow = document.createElement("div");
-        labelRow.className = "flex items-center gap-1.5 text-xs text-emerald-100 font-bold select-none";
+        labelRow.className = "flex items-center gap-2 text-sm sm:text-base text-white font-extrabold select-none";
         labelRow.innerHTML = `
-          <i data-lucide="user" class="w-3.5 h-3.5 text-white"></i>
-          <span class="text-white font-extrabold">닉네임 선택</span>
-          <span class="text-[11px] font-mono font-bold text-emerald-950 bg-emerald-100 px-2 py-0.5 rounded-full">${multiNicknameChoices.length}건 검색됨</span>
+          <i data-lucide="user" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-200 stroke-[2.5]"></i>
+          <span class="tracking-tight drop-shadow-xs">닉네임을 선택해 주세요</span>
         `;
         wrapper.appendChild(labelRow);
 
+        // 라벨 아래부터 나열되는 닉네임 버튼 목록 영역 (스크롤 없이 전체 노출)
         const chipsList = document.createElement("div");
         chipsList.className = "flex flex-wrap items-center gap-2 py-0.5";
 
         multiNicknameChoices.forEach(nick => {
-          const count = ordersData.filter(o => (o.nickname || "").toLowerCase() === nick.toLowerCase()).length;
           const chip = document.createElement("button");
           chip.type = "button";
-          chip.className = "text-xs sm:text-sm px-3.5 py-1.5 rounded-full font-bold bg-white text-slate-800 hover:bg-emerald-50 active:scale-95 shadow-md border border-white transition-all flex items-center gap-2 cursor-pointer";
+          chip.className = "text-xs sm:text-sm px-3.5 py-1.5 rounded-full font-extrabold bg-white text-slate-900 hover:bg-emerald-50 active:scale-95 shadow-md border border-white transition-all inline-flex items-center justify-center cursor-pointer";
           chip.innerHTML = `
-            <span class="truncate max-w-[140px] text-slate-900 font-extrabold">${escapeHtml(nick)}</span>
-            <span class="text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-mono font-bold">${count}건</span>
+            <span class="truncate max-w-[160px] select-none">${escapeHtml(nick)}</span>
           `;
           chip.addEventListener("click", () => selectNickname(nick));
           chipsList.appendChild(chip);
