@@ -153,11 +153,9 @@
       <i data-lucide="refresh-ccw" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600"></i>
       <span class="tracking-tight">DB UPDATE</span>
     </button>
-    <!-- DB UPDATE 버튼 오른쪽에 표시되는 업데이트 일자/시각 뱃지 (테두리 제거) -->
-    <div id="dbUpdateTimestampBadge" class="px-3 py-2 bg-white/95 backdrop-blur-md rounded-2xl shadow-sm text-emerald-900 text-xs font-semibold flex items-center gap-2">
-      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      <span class="text-emerald-700/80 font-medium">최근 갱신:</span>
-      <span id="dbUpdateTimestampText" class="font-mono font-bold text-emerald-950">-</span>
+    <!-- DB UPDATE 버튼 오른쪽에 표시되는 업데이트 일자/시각 (초록색 점 삭제 및 회색 텍스트 적용) -->
+    <div id="dbUpdateTimestampBadge" class="px-2.5 py-1.5 bg-white/95 backdrop-blur-md rounded-2xl shadow-sm flex items-center">
+      <span id="dbUpdateTimestampText" class="font-mono font-medium text-slate-500 text-[11px]">-</span>
     </div>
   </div>
 
