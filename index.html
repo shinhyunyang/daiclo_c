@@ -35,31 +35,51 @@
     }
   </script>
   <style>
-    body { font-family: 'Pretendard', sans-serif; background-color: #f7faf8; color: #064e3b; overflow-x: hidden; }
+    body { 
+      font-family: 'Pretendard', sans-serif; 
+      background-color: #f7faf8; 
+      color: #064e3b; 
+      overflow-x: hidden; 
+    }
     /* 모바일 브라우저(iOS Safari 등) 포커스 시 자동 확대 방지 (16px 이상 유지) */
     input, select, textarea {
       font-size: 16px !important;
     }
     .badge-logo {
-      background-color: #34a862; color: #fff; border-radius: 9999px; display: inline-flex;
-      align-items: center; justify-content: center; letter-spacing: -0.02em; border: 2px solid #278b4e;
+      background-color: #34a862; 
+      color: #fff; 
+      border-radius: 9999px; 
+      display: inline-flex;
+      align-items: center; 
+      justify-content: center; 
+      letter-spacing: -0.02em; 
+      border: 2px solid #278b4e;
       box-shadow: 0 4px 14px rgba(46, 158, 102, 0.25);
     }
     /* 전역 및 컨테이너 스크롤바 완전 삭제 (터치 및 마우스 휠 동작은 정상 유지) */
     * {
-      -ms-overflow-style: none; /* IE, Edge */
-      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none !important; /* IE, Edge */
+      scrollbar-width: none !important; /* Firefox */
     }
     *::-webkit-scrollbar {
       display: none !important;
       width: 0px !important;
       height: 0px !important;
     }
+    .no-scrollbar {
+      -ms-overflow-style: none !important;
+      scrollbar-width: none !important;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none !important;
+      width: 0px !important;
+      height: 0px !important;
+    }
   </style>
 </head>
-<body class="min-h-screen bg-[#f7faf8] flex flex-col selection:bg-emerald-200 selection:text-emerald-900">
+<body class="h-screen h-[100dvh] bg-[#f7faf8] flex flex-col selection:bg-emerald-200 selection:text-emerald-900 overflow-hidden">
 
-  <header class="bg-white/90 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-30 shadow-sm">
+  <header class="bg-white/90 backdrop-blur-md border-b border-emerald-100 shrink-0 z-30 shadow-sm">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <button id="headerLogoBtn" type="button" title="홈 화면으로 이동 및 새로고침" aria-label="홈 화면으로 이동 및 새로고침"
@@ -79,9 +99,9 @@
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-6 pb-32">
-    <!-- 요청하신 산뜻한 그린 컬러(#34a862) 배경 적용 -->
-    <div class="bg-[#34a862] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-[#2b9454]">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-20 sm:pb-24 flex-1 w-full flex flex-col min-h-0 space-y-4">
+    <!-- 고정 상단 검색 영역 -->
+    <div class="bg-[#34a862] rounded-3xl p-5 sm:p-7 text-white shadow-xl relative overflow-hidden border border-[#2b9454] shrink-0">
       <button id="manualHomeRefreshBtn" type="button" title="홈 화면으로 초기화 및 새로고침" aria-label="홈 화면으로 초기화 및 새로고침"
         class="absolute top-4 sm:top-6 right-4 sm:right-6 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 hover:bg-white/30 active:scale-90 text-white border border-white/25 flex items-center justify-center shadow-md backdrop-blur-xs transition-all cursor-pointer">
         <i data-lucide="home" class="w-5 h-5 text-white stroke-[2.2]"></i>
@@ -91,24 +111,24 @@
         DAICLO
       </div>
 
-      <div class="relative z-10 w-full space-y-4">
+      <div class="relative z-10 w-full space-y-3 sm:space-y-4">
         <div class="pr-12 sm:pr-14">
           <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex flex-wrap items-baseline gap-2">
             <span>공동구매 상품 주문조회</span>
           </h1>
-          <p class="text-sm text-emerald-50 leading-relaxed font-normal mt-1">
+          <p class="text-xs sm:text-sm text-emerald-50 leading-relaxed font-normal mt-1">
             주문하신 닉네임으로 주문내역을 조회하세요
           </p>
         </div>
 
-        <div class="pt-2 relative space-y-3 w-full">
+        <div class="pt-1 relative space-y-2.5 w-full">
           <div class="flex items-stretch gap-2 sm:gap-3 w-full">
             <div class="relative flex-1 min-w-0 flex items-center">
               <div class="absolute left-3.5 sm:left-4.5 text-emerald-600/70 pointer-events-none flex items-center">
                 <i data-lucide="search" class="w-4 h-4 sm:w-4.5 sm:h-4.5"></i>
               </div>
               <input type="text" id="nicknameSearchInput" placeholder="예) 헬리오1234 / 1234" autocomplete="off"
-                class="w-full bg-white text-emerald-950 placeholder:text-emerald-700/45 pl-9 sm:pl-11 pr-9 sm:pr-10 py-3.5 sm:py-4 md:py-4.5 rounded-2xl font-medium text-base focus:outline-none focus:ring-4 focus:ring-emerald-200 shadow-lg">
+                class="w-full bg-white text-emerald-950 placeholder:text-emerald-700/45 pl-9 sm:pl-11 pr-9 sm:pr-10 py-3 sm:py-3.5 md:py-4 rounded-2xl font-medium text-base focus:outline-none focus:ring-4 focus:ring-emerald-200 shadow-lg">
               <button id="clearSearchBtn" type="button" aria-label="검색어 지우기" class="absolute right-3 text-emerald-600 hover:text-emerald-900 hidden p-1 cursor-pointer">
                 <i data-lucide="x" class="w-4 h-4 sm:w-4.5 sm:h-4.5"></i>
               </button>
@@ -119,25 +139,28 @@
             </button>
           </div>
 
-          <div id="matchingChipsContainer" class="hidden pt-1 transition-all">
+          <div id="matchingChipsContainer" class="hidden transition-all">
             <div id="nicknameChipList" class="w-full"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 하단 주문목록 컨테이너도 동일한 배경색(#34a862)으로 일치 적용 및 정중앙 정렬 보장 -->
-    <div class="bg-[#34a862] rounded-3xl border border-[#2b9454] shadow-xl overflow-hidden min-h-[360px] sm:min-h-[420px] relative">
-      <div id="ordersListContainer" class="p-4 sm:p-6 space-y-5"></div>
+    <!-- 하단 주문목록 컨테이너: 상단 고정 하에 남은 높이(flex-1 min-h-0)를 채우며 내부 스크롤 적용 -->
+    <div class="bg-[#34a862] rounded-3xl border border-[#2b9454] shadow-xl flex-1 min-h-0 relative overflow-hidden flex flex-col">
+      <!-- 스크롤 가능 컨테이너 (no-scrollbar 적용 및 오버스크롤 터치 지원) -->
+      <div id="ordersScrollWrapper" class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 no-scrollbar overscroll-contain">
+        <div id="ordersListContainer" class="space-y-4"></div>
+      </div>
 
-      <!-- 상하좌우 완벽한 기하학적 정중앙 배치 (absolute inset-0) -->
+      <!-- 상하좌우 완벽한 기하학적 정중앙 배치 (초기 대기 상태) -->
       <div id="initialStatePrompt" class="absolute inset-0 flex items-center justify-center text-emerald-50 pointer-events-none">
         <div class="w-16 h-16 bg-white/15 rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-sm">
           <i data-lucide="user-search" class="w-8 h-8"></i>
         </div>
       </div>
 
-      <div id="emptyResultsState" class="hidden absolute inset-0 p-10 sm:p-16 text-center text-emerald-50 flex flex-col items-center justify-center my-auto">
+      <div id="emptyResultsState" class="hidden absolute inset-0 p-8 sm:p-12 text-center text-emerald-50 flex flex-col items-center justify-center my-auto">
         <div class="w-16 h-16 bg-rose-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-rose-200 border border-rose-800/40">
           <i data-lucide="search-x" class="w-8 h-8"></i>
         </div>
@@ -148,6 +171,8 @@
         </button>
       </div>
     </div>
+  </main>
+
   <!-- 화면 왼쪽 하단: 갱신 시각 및 컨트롤 버튼 바 -->
   <div class="fixed bottom-4 sm:bottom-6 left-4 sm:left-6 z-40 flex flex-wrap items-center gap-2 sm:gap-2.5 select-none pointer-events-auto max-w-[calc(100vw-2rem)]">
     <button id="systemSyncBtn" type="button" class="px-3.5 py-2.5 bg-white/95 backdrop-blur-md border border-emerald-200/80 rounded-2xl shadow-sm text-emerald-800 hover:bg-emerald-50 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold">
@@ -157,6 +182,39 @@
     <!-- DB UPDATE 버튼 오른쪽에 표시되는 업데이트 일자/시각 (초록색 점 삭제 및 회색 텍스트 적용) -->
     <div id="dbUpdateTimestampBadge" class="px-2.5 py-1.5 bg-white/95 backdrop-blur-md rounded-2xl shadow-sm flex items-center">
       <span id="dbUpdateTimestampText" class="font-mono font-medium text-slate-500 text-[11px]">-</span>
+    </div>
+  </div>
+
+  <!-- 닉네임 선택 팝업 모달 -->
+  <div id="nicknameSelectModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[82vh] flex flex-col transform scale-95 transition-transform duration-300 overflow-hidden border border-emerald-100" id="nicknameSelectModalContent">
+      <div class="p-5 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">
+            <i data-lucide="users" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+              <span>닉네임 선택</span>
+              <span id="nicknameCountBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white">0</span>
+            </h3>
+            <p class="text-xs text-slate-500 font-medium mt-0.5">조회할 회원의 닉네임을 선택해 주세요</p>
+          </div>
+        </div>
+        <button id="closeNicknameSelectBtn" type="button" aria-label="닫기" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-5 overflow-y-auto flex-1 bg-slate-50/40">
+        <div id="modalNicknameList" class="flex flex-col gap-2"></div>
+      </div>
+
+      <div class="p-4 border-t border-slate-100 bg-white flex justify-end">
+        <button id="cancelNicknameSelectBtn" type="button" class="w-full sm:w-auto px-5 py-2.5 text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 active:scale-95 font-bold rounded-xl transition-all cursor-pointer">
+          닫기
+        </button>
+      </div>
     </div>
   </div>
 
@@ -230,6 +288,11 @@
         </button>
       </div>
     </div>
+  </div>
+
+  <div id="toastNotification" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl text-white text-sm font-bold bg-emerald-600 transform translate-y-20 opacity-0 pointer-events-none">
+    <div id="toastIcon"></div>
+    <span id="toastMessage"></span>
   </div>
 
   <iframe id="appsScriptHiddenTarget" name="appsScriptHiddenTarget" style="display:none; width:0; height:0; border:0;"></iframe>
@@ -313,6 +376,7 @@
       
       chipContainer.innerHTML = "";
 
+      // 선택된 회원이 있을 때만 상단에 표시
       if (activeSelectedNickname) {
         container.classList.remove("hidden");
 
@@ -333,10 +397,6 @@
         if (deselectBtn) {
           deselectBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            const allNicknames = [...new Set(ordersData.map(o => (o.nickname || "").trim()).filter(Boolean))];
-            const input = document.getElementById("nicknameSearchInput");
-            const val = input ? input.value.trim() : "";
-            multiNicknameChoices = allNicknames.filter(n => n.toLowerCase().includes(val.toLowerCase()));
             activeSelectedNickname = "";
             render();
           });
@@ -347,43 +407,57 @@
         return;
       }
 
-      if (multiNicknameChoices && multiNicknameChoices.length > 0) {
-        container.classList.remove("hidden");
+      container.classList.add("hidden");
+    }
 
-        const wrapper = document.createElement("div");
-        wrapper.className = "flex flex-col gap-2.5 w-full";
+    function openNicknameSelectModal(nicknames) {
+      const modal = document.getElementById("nicknameSelectModal");
+      const modalContent = document.getElementById("nicknameSelectModalContent");
+      const listElem = document.getElementById("modalNicknameList");
+      const countBadge = document.getElementById("nicknameCountBadge");
+      if (!modal || !modalContent || !listElem) return;
 
-        const labelRow = document.createElement("div");
-        labelRow.className = "flex items-center gap-2 text-sm sm:text-base text-white font-extrabold select-none";
-        labelRow.innerHTML = `
-          <i data-lucide="user" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-200 stroke-[2.5]"></i>
-          <span class="tracking-tight drop-shadow-xs">닉네임을 선택해 주세요</span>
+      listElem.innerHTML = "";
+      if (countBadge) countBadge.textContent = nicknames.length;
+
+      nicknames.forEach(nick => {
+        const itemBtn = document.createElement("button");
+        itemBtn.type = "button";
+        itemBtn.className = "w-full text-left px-4 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 active:scale-[0.99] border border-slate-200/80 hover:border-emerald-300 shadow-xs flex items-center justify-between transition-all group cursor-pointer";
+        itemBtn.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 transition-colors">
+              <i data-lucide="user" class="w-4 h-4"></i>
+            </div>
+            <span class="font-bold text-slate-800 group-hover:text-emerald-950 text-base truncate">${escapeHtml(nick)}</span>
+          </div>
+          <div class="shrink-0 flex items-center gap-1 text-emerald-600 font-bold text-xs pl-2">
+            <span>선택</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"></i>
+          </div>
         `;
-        wrapper.appendChild(labelRow);
 
-        // 라벨 아래부터 나열되는 닉네임 버튼 목록 영역 (스크롤 없이 전체 노출)
-        const chipsList = document.createElement("div");
-        chipsList.className = "flex flex-wrap items-center gap-2 py-0.5";
-
-        multiNicknameChoices.forEach(nick => {
-          const chip = document.createElement("button");
-          chip.type = "button";
-          chip.className = "text-xs sm:text-sm px-3.5 py-1.5 rounded-full font-extrabold bg-white text-slate-900 hover:bg-emerald-50 active:scale-95 shadow-md border border-white transition-all inline-flex items-center justify-center cursor-pointer";
-          chip.innerHTML = `
-            <span class="truncate max-w-[160px] select-none">${escapeHtml(nick)}</span>
-          `;
-          chip.addEventListener("click", () => selectNickname(nick));
-          chipsList.appendChild(chip);
+        itemBtn.addEventListener("click", () => {
+          closeNicknameSelectModal();
+          selectNickname(nick);
         });
 
-        wrapper.appendChild(chipsList);
-        chipContainer.appendChild(wrapper);
+        listElem.appendChild(itemBtn);
+      });
 
-        if (window.lucide) lucide.createIcons();
-        return;
-      }
+      if (window.lucide) lucide.createIcons();
 
-      container.classList.add("hidden");
+      modal.classList.remove("opacity-0", "pointer-events-none");
+      modalContent.classList.remove("scale-95");
+    }
+
+    function closeNicknameSelectModal() {
+      const modal = document.getElementById("nicknameSelectModal");
+      const modalContent = document.getElementById("nicknameSelectModalContent");
+      if (!modal || !modalContent) return;
+
+      modal.classList.add("opacity-0", "pointer-events-none");
+      modalContent.classList.add("scale-95");
     }
 
     function selectNickname(nick) {
@@ -411,19 +485,30 @@
     function executeNicknameSearch() {
       const input = document.getElementById("nicknameSearchInput");
       const val = input ? input.value.trim() : "";
-      if (!val) return clearSelectedNickname();
+      if (!val) {
+        if (typeof showAlert === "function") {
+          showAlert("검색할 닉네임을 입력해 주세요.");
+        } else {
+          showToast("검색할 닉네임을 입력해 주세요.", "error");
+        }
+        return;
+      }
       
       searchQuery = val;
       const allNicknames = [...new Set(ordersData.map(o => (o.nickname || "").trim()).filter(Boolean))];
       const matching = allNicknames.filter(n => n.toLowerCase().includes(val.toLowerCase()));
 
-      activeSelectedNickname = "";
+      // 한글 및 숫자 자연 오름차순 정렬 (숫자 크기 및 가나다 순)
+      matching.sort((a, b) => a.localeCompare(b, "ko", { numeric: true, sensitivity: "base" }));
+
       multiNicknameChoices = matching;
-      render();
-      if(matching.length > 0) {
-        showToast(`${matching.length}건 검색됨. 하단 칩을 클릭하세요.`, "info");
-      } else {
+
+      if (matching.length === 0) {
+        activeSelectedNickname = "";
+        render();
         showToast("일치하는 닉네임이 없습니다. 주문하신 닉네임으로 다시 입력해주세요", "error");
+      } else {
+        openNicknameSelectModal(matching);
       }
     }
 
@@ -974,6 +1059,11 @@
       }
       if (clearBtn) clearBtn.addEventListener("click", clearSelectedNickname);
       if (resetBtn) resetBtn.addEventListener("click", clearSelectedNickname);
+
+      const closeNicknameSelectBtn = document.getElementById("closeNicknameSelectBtn");
+      const cancelNicknameSelectBtn = document.getElementById("cancelNicknameSelectBtn");
+      if (closeNicknameSelectBtn) closeNicknameSelectBtn.addEventListener("click", closeNicknameSelectModal);
+      if (cancelNicknameSelectBtn) cancelNicknameSelectBtn.addEventListener("click", closeNicknameSelectModal);
 
       const pwModal = document.getElementById("passwordModal");
       const pwContent = document.getElementById("passwordModalContent");
