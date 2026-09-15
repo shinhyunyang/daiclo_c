@@ -41,12 +41,19 @@
       color: #064e3b; 
       overflow-x: hidden; 
     }
-    /* 화면 바운스 및 전체 스크롤 원천 차단 (상단 영역 절대 고정) */
+    /* 화면 바운스 및 브라우저 전체 스크롤 원천 차단 (상단 헤더 절대 위치 고정) */
     html, body {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
       height: 100%;
       height: 100dvh;
       overflow: hidden;
       overscroll-behavior: none;
+      overscroll-behavior-y: none;
       -webkit-overflow-scrolling: touch;
     }
     /* 모바일 브라우저(iOS Safari 등) 포커스 시 자동 확대 방지 (16px 이상 유지) */
@@ -87,8 +94,8 @@
 </head>
 <body class="h-screen h-[100dvh] w-full bg-[#f7faf8] flex flex-col selection:bg-emerald-200 selection:text-emerald-900 overflow-hidden select-none">
 
-  <!-- [고정 1] 최상단 브랜드 로고 헤더 (절대 이동하지 않음) -->
-  <header class="bg-white/90 backdrop-blur-md border-b border-emerald-100 shrink-0 z-30 shadow-sm w-full">
+  <!-- [고정 1] 최상단 브랜드 로고 헤더 (어떠한 터치/스크롤 제스처에도 절대 이동하지 않음) -->
+  <header class="sticky top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-emerald-100 shrink-0 z-50 shadow-sm w-full touch-none select-none">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <button id="headerLogoBtn" type="button" title="홈 화면으로 이동 및 새로고침" aria-label="홈 화면으로 이동 및 새로고침"
@@ -1121,6 +1128,14 @@
       const verifyPwBtn = document.getElementById("verifyPasswordBtn");
       if (verifyPwBtn) verifyPwBtn.addEventListener("click", checkPassword);
       if (pwInput) pwInput.addEventListener("keydown", e => { if (e.key === "Enter") checkPassword(); });
+
+      // 모바일 등에서 스크롤 가능 영역 외를 위로 밀 때 화면 전체가 들썩이거나 헤더가 밀려 올라가는 현상 원천 차단
+      document.addEventListener("touchmove", (e) => {
+        const scrollable = e.target.closest("#ordersScrollWrapper, #modalNicknameList, #historyListContainer");
+        if (!scrollable) {
+          e.preventDefault();
+        }
+      }, { passive: false });
 
       if (window.lucide) lucide.createIcons();
     });
