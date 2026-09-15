@@ -41,6 +41,14 @@
       color: #064e3b; 
       overflow-x: hidden; 
     }
+    /* 화면 바운스 및 전체 스크롤 원천 차단 (상단 영역 절대 고정) */
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      overscroll-behavior: none;
+      -webkit-overflow-scrolling: touch;
+    }
     /* 모바일 브라우저(iOS Safari 등) 포커스 시 자동 확대 방지 (16px 이상 유지) */
     input, select, textarea {
       font-size: 16px !important;
@@ -77,9 +85,10 @@
     }
   </style>
 </head>
-<body class="h-screen h-[100dvh] bg-[#f7faf8] flex flex-col selection:bg-emerald-200 selection:text-emerald-900 overflow-hidden">
+<body class="h-screen h-[100dvh] w-full bg-[#f7faf8] flex flex-col selection:bg-emerald-200 selection:text-emerald-900 overflow-hidden select-none">
 
-  <header class="bg-white/90 backdrop-blur-md border-b border-emerald-100 shrink-0 z-30 shadow-sm">
+  <!-- [고정 1] 최상단 브랜드 로고 헤더 (절대 이동하지 않음) -->
+  <header class="bg-white/90 backdrop-blur-md border-b border-emerald-100 shrink-0 z-30 shadow-sm w-full">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <button id="headerLogoBtn" type="button" title="홈 화면으로 이동 및 새로고침" aria-label="홈 화면으로 이동 및 새로고침"
@@ -99,9 +108,9 @@
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-20 sm:pb-24 flex-1 w-full flex flex-col min-h-0 space-y-4">
-    <!-- 고정 상단 검색 영역 -->
-    <div class="bg-[#34a862] rounded-3xl p-5 sm:p-7 text-white shadow-xl relative overflow-hidden border border-[#2b9454] shrink-0">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-3 sm:pt-5 pb-20 sm:pb-24 flex-1 w-full flex flex-col min-h-0 space-y-3 sm:space-y-4 overflow-hidden">
+    <!-- [고정 2] 요청하신 이미지 레이아웃 영역 (터치/스크롤 제스처 시에도 화면상 전혀 움직이지 않도록 shrink-0 및 overscroll 차단) -->
+    <div class="bg-[#34a862] rounded-3xl p-4 sm:p-6 text-white shadow-xl relative overflow-hidden border border-[#2b9454] shrink-0 select-none touch-none">
       <button id="manualHomeRefreshBtn" type="button" title="홈 화면으로 초기화 및 새로고침" aria-label="홈 화면으로 초기화 및 새로고침"
         class="absolute top-4 sm:top-6 right-4 sm:right-6 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 hover:bg-white/30 active:scale-90 text-white border border-white/25 flex items-center justify-center shadow-md backdrop-blur-xs transition-all cursor-pointer">
         <i data-lucide="home" class="w-5 h-5 text-white stroke-[2.2]"></i>
@@ -111,17 +120,17 @@
         DAICLO
       </div>
 
-      <div class="relative z-10 w-full space-y-3 sm:space-y-4">
+      <div class="relative z-10 w-full space-y-2.5 sm:space-y-3.5">
         <div class="pr-12 sm:pr-14">
           <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex flex-wrap items-baseline gap-2">
             <span>공동구매 상품 주문조회</span>
           </h1>
-          <p class="text-xs sm:text-sm text-emerald-50 leading-relaxed font-normal mt-1">
+          <p class="text-xs sm:text-sm text-emerald-50 leading-relaxed font-normal mt-0.5">
             주문하신 닉네임으로 주문내역을 조회하세요
           </p>
         </div>
 
-        <div class="pt-1 relative space-y-2.5 w-full">
+        <div class="pt-0.5 relative space-y-2 sm:space-y-2.5 w-full">
           <div class="flex items-stretch gap-2 sm:gap-3 w-full">
             <div class="relative flex-1 min-w-0 flex items-center">
               <div class="absolute left-3.5 sm:left-4.5 text-emerald-600/70 pointer-events-none flex items-center">
@@ -146,10 +155,10 @@
       </div>
     </div>
 
-    <!-- 하단 주문목록 컨테이너: 상단 고정 하에 남은 높이(flex-1 min-h-0)를 채우며 내부 스크롤 적용 -->
+    <!-- 하단 주문목록 컨테이너: 상단 영역 고정 하에 남은 높이 전체를 차지하며 이 내부에서만 독립 스크롤 -->
     <div class="bg-[#34a862] rounded-3xl border border-[#2b9454] shadow-xl flex-1 min-h-0 relative overflow-hidden flex flex-col">
-      <!-- 스크롤 가능 컨테이너 (no-scrollbar 적용 및 오버스크롤 터치 지원) -->
-      <div id="ordersScrollWrapper" class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 no-scrollbar overscroll-contain">
+      <!-- 스크롤 가능 컨테이너 (스크롤바 완전 숨김 및 리스트 영역 전용 터치 스크롤 지원) -->
+      <div id="ordersScrollWrapper" class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 no-scrollbar overscroll-contain touch-pan-y">
         <div id="ordersListContainer" class="space-y-4"></div>
       </div>
 
