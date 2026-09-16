@@ -734,27 +734,30 @@
         return new Date(parts[0], parseInt(parts[1], 10) - 1, parts[2]).getTime() || 0;
       };
 
-      const isTodayDate = (dateStr) => {
-        if (!dateStr) return false;
-        const today = new Date();
-        const tY = today.getFullYear();
-        const tM = today.getMonth() + 1;
-        const tD = today.getDate();
-
+      const getPickupDateMidnight = (dateStr) => {
+        if (!dateStr) return null;
         const nums = String(dateStr).match(/\d+/g);
-        if (!nums || nums.length < 2) return false;
+        if (!nums || nums.length < 2) return null;
+        const today = new Date();
+        let y, m, d;
         if (nums.length >= 3) {
-          let y = parseInt(nums[0], 10);
+          y = parseInt(nums[0], 10);
           if (y < 100) y += 2000;
-          const m = parseInt(nums[1], 10);
-          const d = parseInt(nums[2], 10);
-          return y === tY && m === tM && d === tD;
+          m = parseInt(nums[1], 10);
+          d = parseInt(nums[2], 10);
         } else {
-          const m = parseInt(nums[0], 10);
-          const d = parseInt(nums[1], 10);
-          return m === tM && d === tD;
+          y = today.getFullYear();
+          m = parseInt(nums[0], 10);
+          d = parseInt(nums[1], 10);
         }
+        const dt = new Date(y, m - 1, d);
+        dt.setHours(0, 0, 0, 0);
+        return dt.getTime();
       };
+
+      const todayDateObj = new Date();
+      todayDateObj.setHours(0, 0, 0, 0);
+      const todayMidnight = todayDateObj.getTime();
 
       filtered.sort((a, b) => {
         const isCompleteA = a.status === "완료" || a.status === "1";
@@ -768,36 +771,55 @@
 
       filtered.forEach((order) => {
         const isComplete = order.status === "완료" || order.status === "1";
-        const isTodayPickup = !isComplete && isTodayDate(order.pickupDate);
+        const pTime = getPickupDateMidnight(order.pickupDate);
+        const isTodayPickup = !isComplete && pTime !== null && pTime === todayMidnight;
+        const isPastPickup = !isComplete && pTime !== null && pTime < todayMidnight;
+
         const itemCard = document.createElement("div");
         itemCard.className = `rounded-2xl transition-all px-4 py-3 sm:py-3.5 flex flex-col gap-2 ${
           isComplete 
             ? 'bg-emerald-950/20 backdrop-blur-xs border border-emerald-900/30 text-emerald-950/70 shadow-inner' 
             : isTodayPickup
               ? 'bg-white border-2 border-orange-400 shadow-md ring-2 ring-orange-200/70 text-black'
-              : 'bg-white border border-emerald-200/90 shadow-xs hover:border-emerald-400 text-black'
+              : isPastPickup
+                ? 'bg-white border-2 border-red-400/90 shadow-sm text-black'
+                : 'bg-white border border-emerald-200/90 shadow-xs hover:border-emerald-400 text-black'
         }`;
 
         const unitPrice = order.unitPrice || (order.quantity > 0 ? Math.round(order.amount / order.quantity) : order.amount);
 
         itemCard.innerHTML = `
-          <div class="min-w-0 flex items-center flex-wrap gap-1.5 sm:gap-2.5 text-sm sm:text-base md:text-lg font-bold ${isComplete ? 'text-emerald-950/80' : 'text-black'}">
-            <span class="truncate max-w-[240px] sm:max-w-md md:max-w-lg font-bold ${isComplete ? 'text-emerald-950/85' : 'text-black'}" title="${escapeHtml(order.productName || '상품명 없음')}">
-              ${escapeHtml(order.productName || "상품명 없음")}
-            </span>
-            <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
-            <span class="whitespace-nowrap">${Number(unitPrice).toLocaleString()}원</span>
-            <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
-            <span class="whitespace-nowrap">${order.quantity}개</span>
-            <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
-            <span class="${isComplete ? 'text-emerald-950/90' : 'text-emerald-950'} font-extrabold whitespace-nowrap">${Number(order.amount).toLocaleString()}원</span>
+          <div class="flex items-center justify-between gap-2 w-full">
+            <div class="min-w-0 flex items-center flex-wrap gap-1.5 sm:gap-2.5 text-sm sm:text-base md:text-lg font-bold ${isComplete ? 'text-emerald-950/80' : 'text-black'}">
+              <span class="truncate max-w-[200px] sm:max-w-md md:max-w-lg font-bold ${isComplete ? 'text-emerald-950/85' : 'text-black'}" title="${escapeHtml(order.productName || '상품명 없음')}">
+                ${escapeHtml(order.productName || "상품명 없음")}
+              </span>
+              <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
+              <span class="whitespace-nowrap">${Number(unitPrice).toLocaleString()}원</span>
+              <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
+              <span class="whitespace-nowrap">${order.quantity}개</span>
+              <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
+              <span class="${isComplete ? 'text-emerald-950/90' : 'text-emerald-950'} font-extrabold whitespace-nowrap">${Number(order.amount).toLocaleString()}원</span>
+            </div>
+
+            ${isTodayPickup ? `
+              <div class="shrink-0 ml-auto pl-2">
+                <span class="text-[11px] sm:text-xs font-black px-3 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-white border border-orange-500 shadow-md shadow-orange-500/30 whitespace-nowrap inline-flex items-center gap-1.5 tracking-tight select-none">
+                  <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                  </span>
+                  <span>오늘 픽업</span>
+                </span>
+              </div>
+            ` : ''}
           </div>
 
           <div class="flex items-center justify-between gap-2 pt-1 border-t ${isComplete ? 'border-emerald-900/20 text-emerald-950/70' : 'border-emerald-100 text-emerald-900'} text-xs sm:text-sm font-medium">
             <div class="flex items-center gap-2 sm:gap-3 min-w-0 truncate">
-              <span class="whitespace-nowrap">주문일자: ${escapeHtml(order.orderDate || "-")}</span>
+              <span class="whitespace-nowrap">주문: ${escapeHtml(order.orderDate || "-")}</span>
               <span class="${isComplete ? 'text-emerald-900/30' : 'text-slate-300'} font-normal select-none">|</span>
-              <span class="whitespace-nowrap ${isTodayPickup ? 'font-bold text-orange-600' : ''}">픽업예정: ${escapeHtml(order.pickupDate || "-")}</span>
+              <span class="whitespace-nowrap ${isTodayPickup ? 'font-bold text-orange-600' : isPastPickup ? 'font-bold text-red-600' : ''}">픽업일: ${escapeHtml(order.pickupDate || "-")}</span>
             </div>
 
             <div class="shrink-0 ml-auto">
@@ -806,17 +828,15 @@
                      <i data-lucide="check" class="w-3 h-3 stroke-[2.5] text-emerald-900/70"></i>
                      <span>픽업 완료</span>
                    </span>` 
-                : isTodayPickup
-                  ? `<span class="text-[11px] sm:text-xs font-black px-3 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-white border border-orange-500 shadow-md shadow-orange-500/30 whitespace-nowrap inline-flex items-center gap-1.5 tracking-tight">
-                       <span class="relative flex h-2 w-2">
-                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
-                         <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                       </span>
-                       <span>오늘 픽업</span>
+                : isPastPickup
+                  ? `<span class="text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg bg-red-600 text-white border border-red-600 shadow-2xs whitespace-nowrap inline-flex items-center">
+                       <span>미픽업</span>
                      </span>`
-                  : `<span class="text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-[#278b4e] border border-[#34a862] shadow-2xs whitespace-nowrap inline-flex items-center">
-                       <span>픽업 전</span>
-                     </span>`
+                  : !isTodayPickup
+                    ? `<span class="text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-[#278b4e] border border-[#34a862] shadow-2xs whitespace-nowrap inline-flex items-center">
+                         <span>픽업 전</span>
+                       </span>`
+                    : ''
               }
             </div>
           </div>
