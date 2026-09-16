@@ -148,9 +148,6 @@
       height: 0px !important;
     }
     /* 카카오톡 및 모바일 전체화면 안전 여백 최적화 */
-    .kakaotalk-env #systemSyncBtnWrapper {
-      bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
-    }
     .kakaotalk-env #orderInquiryView,
     .kakaotalk-env #storeLocationView,
     .kakaotalk-env #couponsView {
@@ -247,10 +244,19 @@
         </button>
       </nav>
 
-      <!-- 드로어 하단 정보 -->
-      <div class="p-4 border-t border-slate-100 bg-slate-50/60 text-xs text-slate-500 select-none">
-        <p class="font-bold text-slate-700">DAICLO 송파헬리오시티점</p>
-        <p class="mt-1 font-mono text-slate-400">관리자 010-6777-3554</p>
+      <!-- 드로어 내부 DB UPDATE 칸 (아래 칸과 100% 동일한 패딩, 배경, 폰트 크기 및 줄간격) -->
+      <button id="drawerDbUpdateBtn" type="button" title="클릭하여 DB 갱신 (관리자)" aria-label="클릭하여 DB 갱신"
+        class="w-full p-4 border-t border-slate-100 bg-slate-50/60 text-left hover:bg-slate-100/70 active:bg-slate-200/50 transition-colors cursor-pointer touch-manipulation select-none shrink-0 block">
+        <p class="text-xs font-bold text-slate-700 leading-snug">DB Update</p>
+        <p class="mt-1 text-[11px] font-mono text-slate-400 leading-snug truncate">
+          <span id="drawerDbUpdateTimestampText">-</span>
+        </p>
+      </button>
+
+      <!-- 드로어 하단 정보 (위 칸과 100% 동일한 폰트 크기 및 줄간격) -->
+      <div class="p-4 border-t border-slate-100 bg-slate-50/60 text-slate-500 select-none shrink-0">
+        <p class="text-xs font-bold text-slate-700 leading-snug">DAICLO 송파헬리오시티점</p>
+        <p class="mt-1 text-[11px] font-mono text-slate-400 leading-snug truncate">관리자 010-6777-3554</p>
       </div>
     </div>
   </div>
@@ -413,19 +419,6 @@
       </button>
     </div>
   </main>
-
-  <!-- 화면 왼쪽 하단: 통합 DB UPDATE 버튼 -->
-  <div id="systemSyncBtnWrapper" class="fixed bottom-4 sm:bottom-6 left-4 sm:left-6 z-30 select-none pointer-events-auto max-w-[calc(100vw-2rem)] mb-[env(safe-area-inset-bottom,0px)]">
-    <button id="systemSyncBtn" type="button" title="클릭하여 DB 갱신 (관리자)" aria-label="클릭하여 DB 갱신"
-      class="px-3.5 py-2.5 bg-white/95 backdrop-blur-md border border-emerald-200/90 rounded-2xl shadow-md text-emerald-900 hover:bg-emerald-50 active:scale-95 transition-all flex items-center gap-2 sm:gap-2.5 cursor-pointer text-xs sm:text-sm font-bold touch-manipulation">
-      <div class="flex items-center gap-1.5 text-emerald-700 font-extrabold">
-        <i data-lucide="refresh-ccw" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600"></i>
-        <span class="tracking-tight">DB UPDATE</span>
-      </div>
-      <span class="w-[1px] h-3.5 bg-slate-200"></span>
-      <span id="dbUpdateTimestampText" class="font-mono font-medium text-slate-500 text-[11px] sm:text-xs">-</span>
-    </button>
-  </div>
 
   <!-- 닉네임 선택 팝업 모달 -->
   <div id="nicknameSelectModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
@@ -934,9 +927,10 @@
 
         const now = new Date();
         const pad = (n) => String(n).padStart(2, "0");
-        const formattedNow = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-        const timeTextElem = document.getElementById("dbUpdateTimestampText");
-        if (timeTextElem) timeTextElem.textContent = formattedNow;
+        const formattedMinute = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        
+        const drawerTimeTextElem = document.getElementById("drawerDbUpdateTimestampText");
+        if (drawerTimeTextElem) drawerTimeTextElem.textContent = formattedMinute;
         
         render();
 
@@ -1221,7 +1215,8 @@
         }
       };
 
-      document.getElementById("systemSyncBtn")?.addEventListener("click", () => {
+      document.getElementById("drawerDbUpdateBtn")?.addEventListener("click", () => {
+        closeSideMenu();
         togglePwModal(true);
       });
 
@@ -1277,7 +1272,6 @@
       const orderInquiryView = document.getElementById("orderInquiryView");
       const storeLocationView = document.getElementById("storeLocationView");
       const couponsView = document.getElementById("couponsView");
-      const systemSyncBtnWrapper = document.getElementById("systemSyncBtnWrapper");
 
       function switchView(viewName) {
         if (orderInquiryView) orderInquiryView.classList.add("hidden");
@@ -1286,17 +1280,14 @@
 
         if (viewName === "order") {
           if (orderInquiryView) orderInquiryView.classList.remove("hidden");
-          if (systemSyncBtnWrapper) systemSyncBtnWrapper.classList.remove("hidden");
         } else if (viewName === "store") {
           if (storeLocationView) storeLocationView.classList.remove("hidden");
-          if (systemSyncBtnWrapper) systemSyncBtnWrapper.classList.add("hidden");
           // 뷰포트 레이아웃 렌더링 후 화면에 꽉 차게 자동 확대
           setTimeout(() => {
             fitMapToScreen(false);
           }, 30);
         } else if (viewName === "coupon") {
           if (couponsView) couponsView.classList.remove("hidden");
-          if (systemSyncBtnWrapper) systemSyncBtnWrapper.classList.add("hidden");
         }
         closeSideMenu();
         if (window.lucide) lucide.createIcons();
