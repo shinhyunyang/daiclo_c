@@ -3,10 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DAICLO 주문내역 조회 시스템</title>
+  <title>DAICLO 주문내역 조회 시스템 - 송파헬리오시티점</title>
+  
+  <script>
+    // 1. Google Sheets gviz 에러 응답 시 ReferenceError 원천 차단을 위한 전역 스텁
+    window.google = window.google || {};
+    window.google.visualization = window.google.visualization || {};
+    window.google.visualization.Query = window.google.visualization.Query || {};
+    window.google.visualization.Query.setResponse = function(response) {
+      if (window._currentGvizCallback && typeof window[window._currentGvizCallback] === 'function') {
+        try {
+          window[window._currentGvizCallback](response);
+        } catch (_) {}
+      }
+    };
+
+    // 2. 외부 CDN 및 크로스 오리진 비동기 스크립트 에러 억제 가드
+    window.onerror = function(message, source, lineno, colno, error) {
+      if (
+        !message ||
+        message === 'Script error.' ||
+        message === 'Script error' ||
+        !source ||
+        (typeof source === 'string' && (source.includes('google') || source.includes('gstatic')))
+      ) {
+        return true;
+      }
+      return false;
+    };
+
+    window.addEventListener('error', function(event) {
+      if (
+        event.message === 'Script error.' ||
+        event.message === 'Script error' ||
+        !event.filename ||
+        (event.filename && (event.filename.includes('google') || event.filename.includes('gstatic')))
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        return true;
+      }
+    }, true);
+  </script>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+
   <script>
     tailwind.config = {
       theme: {
@@ -32,7 +77,7 @@
           }
         }
       }
-    }
+    };
   </script>
   <style>
     body { 
@@ -41,7 +86,6 @@
       color: #064e3b; 
       overflow-x: hidden; 
     }
-    /* 화면 바운스 및 브라우저 전체 스크롤 원천 차단 (상단 헤더 절대 위치 고정) */
     html, body {
       position: fixed;
       top: 0;
@@ -56,9 +100,9 @@
       overscroll-behavior-y: none;
       -webkit-overflow-scrolling: touch;
     }
-    /* 모바일 브라우저(iOS Safari 등) 포커스 시 자동 확대 방지 (16px 이상 유지) */
-    input, select, textarea {
+    input, select, textarea, button {
       font-size: 16px !important;
+      touch-action: manipulation;
     }
     .badge-logo {
       background-color: #34a862; 
@@ -71,10 +115,9 @@
       border: 2px solid #278b4e;
       box-shadow: 0 4px 14px rgba(46, 158, 102, 0.25);
     }
-    /* 전역 및 컨테이너 스크롤바 완전 삭제 (터치 및 마우스 휠 동작은 정상 유지) */
     * {
-      -ms-overflow-style: none !important; /* IE, Edge */
-      scrollbar-width: none !important; /* Firefox */
+      -ms-overflow-style: none !important;
+      scrollbar-width: none !important;
     }
     *::-webkit-scrollbar {
       display: none !important;
@@ -92,14 +135,14 @@
     }
   </style>
 </head>
-<body class="h-screen h-[100dvh] w-full bg-[#f7faf8] flex flex-col selection:bg-emerald-200 selection:text-emerald-900 overflow-hidden select-none">
+<body class="h-screen h-[100dvh] w-full bg-[#f7faf8] flex flex-col selection:bg-emerald-200 selection:text-emerald-900 overflow-hidden">
 
-  <!-- [고정 1] 최상단 브랜드 로고 헤더 (어떠한 터치/스크롤 제스처에도 절대 이동하지 않음) -->
-  <header class="sticky top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-emerald-100 shrink-0 z-50 shadow-sm w-full touch-none select-none">
+  <!-- [고정 1] 최상단 브랜드 로고 헤더 -->
+  <header class="sticky top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-emerald-100 shrink-0 z-40 shadow-sm w-full select-none">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
-      <div class="flex items-center gap-3">
+      <div id="headerHomeClickArea" class="flex items-center gap-3 cursor-pointer select-none active:opacity-85 transition-opacity" title="홈 화면으로 이동">
         <button id="headerLogoBtn" type="button" title="홈 화면으로 이동 및 새로고침" aria-label="홈 화면으로 이동 및 새로고침"
-          class="badge-logo px-4 py-1.5 sm:px-5 sm:py-2 hover:opacity-90 active:scale-95 transition-all cursor-pointer">
+          class="badge-logo px-4 py-1.5 sm:px-5 sm:py-2 hover:opacity-90 active:scale-95 transition-all cursor-pointer pointer-events-auto">
           <div class="flex items-center tracking-wider font-extrabold font-brand text-lg sm:text-2xl text-white select-none">
             <span>D</span>
             <span class="relative mx-[0.5px]">
@@ -112,12 +155,68 @@
         </button>
         <span class="text-lg sm:text-2xl font-black font-brand text-emerald-900 tracking-tight ml-1.5 sm:ml-2">송파헬리오시티점</span>
       </div>
+
+      <!-- 우측 상단 햄버거 메뉴 버튼 -->
+      <button id="hamburgerMenuBtn" type="button" aria-label="메뉴 열기" title="메뉴"
+        class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-50 active:scale-95 text-emerald-800 flex items-center justify-center cursor-pointer touch-manipulation">
+        <i data-lucide="menu" class="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]"></i>
+      </button>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-3 sm:pt-5 pb-20 sm:pb-24 flex-1 w-full flex flex-col min-h-0 space-y-3 sm:space-y-4 overflow-hidden">
-    <!-- [고정 2] 요청하신 이미지 레이아웃 영역 (터치/스크롤 제스처 시에도 화면상 전혀 움직이지 않도록 shrink-0 및 overscroll 차단) -->
-    <div class="bg-[#34a862] rounded-3xl p-4 sm:p-6 text-white shadow-xl relative overflow-hidden border border-[#2b9454] shrink-0 select-none touch-none">
+  <!-- 사이드 드로어 네비게이션 메뉴 (오른쪽에서 슬라이드) -->
+  <div id="sideMenuDrawerBackdrop" class="hidden fixed inset-0 z-50 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="sideMenuDrawer" class="absolute top-0 right-0 bottom-0 w-72 sm:w-80 bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-out border-l border-emerald-100">
+      <!-- 드로어 헤더 -->
+      <div class="px-5 py-4 sm:px-6 sm:py-5 border-b border-emerald-100/70 flex items-center justify-between bg-white">
+        <div class="flex items-center gap-2.5">
+          <div class="badge-logo px-2.5 py-0.5">
+            <span class="font-extrabold font-brand text-[11px] text-white tracking-wider">DAICLO</span>
+          </div>
+          <span class="text-base font-extrabold text-emerald-950 tracking-tight">전체메뉴</span>
+        </div>
+        <button id="closeSideMenuBtn" type="button" aria-label="메뉴 닫기" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer touch-manipulation">
+          <i data-lucide="x" class="w-5 h-5 stroke-[2]"></i>
+        </button>
+      </div>
+
+      <!-- 메뉴 카테고리 목록: 1. 보유 쿠폰 / 2. 매장 위치 및 주차안내 -->
+      <nav class="flex-1 p-4 space-y-3 overflow-y-auto no-scrollbar">
+        <!-- 첫번째: 보유 쿠폰 (서비스 준비중) -->
+        <button id="navCouponsBtn" type="button" class="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-[22px] bg-white text-slate-800 font-bold text-sm sm:text-base border border-slate-100 hover:bg-slate-50 transition-all cursor-pointer touch-manipulation shadow-2xs">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-slate-50 text-slate-500 flex items-center justify-center border border-slate-200/60 shadow-2xs">
+              <i data-lucide="ticket" class="w-5 h-5 stroke-[2]"></i>
+            </div>
+            <span class="tracking-tight text-slate-800 font-bold">보유 쿠폰</span>
+          </div>
+          <span class="text-xs font-bold px-2.5 py-1 rounded-xl bg-amber-50 text-amber-700 border border-amber-300/80 shadow-2xs tracking-tight">준비중</span>
+        </button>
+
+        <!-- 두번째: 매장 위치 및 주차안내 -->
+        <button id="navStoreLocationBtn" type="button" class="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-[22px] bg-white text-slate-800 font-bold text-sm sm:text-base border border-slate-100 hover:bg-slate-50 transition-all cursor-pointer touch-manipulation shadow-2xs">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-slate-50 text-slate-500 flex items-center justify-center border border-slate-200/60 shadow-2xs">
+              <i data-lucide="map-pin" class="w-5 h-5 stroke-[2]"></i>
+            </div>
+            <span class="tracking-tight text-slate-800 font-bold">매장 위치 및 주차안내</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 stroke-[2.2]"></i>
+        </button>
+      </nav>
+
+      <!-- 드로어 하단 정보 -->
+      <div class="p-4 border-t border-slate-100 bg-slate-50/60 text-xs text-slate-500 select-none">
+        <p class="font-bold text-slate-700">DAICLO 송파헬리오시티점</p>
+        <p class="mt-1 font-mono text-slate-400">관리자 010-6777-3554</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- [메인 화면 영역 1] 공동구매 주문 조회 화면 (기본 활성화) -->
+  <main id="orderInquiryView" class="max-w-6xl mx-auto px-4 sm:px-6 pt-3 sm:pt-5 pb-20 sm:pb-24 flex-1 w-full flex flex-col min-h-0 space-y-3 sm:space-y-4 overflow-hidden">
+    <!-- 검색 영역 카드 -->
+    <div class="bg-[#34a862] rounded-3xl p-4 sm:p-6 text-white shadow-xl relative overflow-hidden border border-[#2b9454] shrink-0 z-20">
       <button id="manualHomeRefreshBtn" type="button" title="홈 화면으로 초기화 및 새로고침" aria-label="홈 화면으로 초기화 및 새로고침"
         class="absolute top-4 sm:top-6 right-4 sm:right-6 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 hover:bg-white/30 active:scale-90 text-white border border-white/25 flex items-center justify-center shadow-md backdrop-blur-xs transition-all cursor-pointer">
         <i data-lucide="home" class="w-5 h-5 text-white stroke-[2.2]"></i>
@@ -128,9 +227,10 @@
       </div>
 
       <div class="relative z-10 w-full space-y-2.5 sm:space-y-3.5">
-        <div class="pr-12 sm:pr-14">
-          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex flex-wrap items-baseline gap-2">
-            <span>공동구매 상품 주문조회</span>
+        <div class="pr-12 sm:pr-14 select-none">
+          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex flex-wrap items-baseline gap-1.5 sm:gap-2">
+            <span>공동구매 주문조회</span>
+            <span class="text-sm sm:text-base md:text-lg font-bold text-emerald-100/90 tracking-normal">(카톡주문 포함)</span>
           </h1>
           <p class="text-xs sm:text-sm text-emerald-50 leading-relaxed font-normal mt-0.5">
             주문하신 닉네임으로 주문내역을 조회하세요
@@ -144,66 +244,132 @@
                 <i data-lucide="search" class="w-4 h-4 sm:w-4.5 sm:h-4.5"></i>
               </div>
               <input type="text" id="nicknameSearchInput" placeholder="예) 헬리오1234 / 1234" autocomplete="off"
-                class="w-full bg-white text-emerald-950 placeholder:text-emerald-700/45 pl-9 sm:pl-11 pr-9 sm:pr-10 py-3 sm:py-3.5 md:py-4 rounded-2xl font-medium text-base focus:outline-none focus:ring-4 focus:ring-emerald-200 shadow-lg">
+                class="w-full bg-white text-emerald-950 placeholder:text-emerald-700/45 pl-9 sm:pl-11 pr-9 sm:pr-10 py-3 sm:py-3.5 md:py-4 rounded-2xl font-medium text-base focus:outline-none focus:ring-4 focus:ring-emerald-200 shadow-lg cursor-text touch-manipulation">
               <button id="clearSearchBtn" type="button" aria-label="검색어 지우기" class="absolute right-3 text-emerald-600 hover:text-emerald-900 hidden p-1 cursor-pointer">
                 <i data-lucide="x" class="w-4 h-4 sm:w-4.5 sm:h-4.5"></i>
               </button>
             </div>
-            <button id="searchNicknameBtn" type="button" class="shrink-0 w-16 sm:w-20 md:w-24 flex items-center justify-center gap-1 sm:gap-1.5 bg-white hover:bg-emerald-50 active:scale-95 text-[#278b4e] font-extrabold text-sm sm:text-base rounded-2xl shadow-lg cursor-pointer border border-white/60 transition-all whitespace-nowrap select-none">
+            <button id="searchNicknameBtn" type="button" class="shrink-0 w-16 sm:w-20 md:w-24 flex items-center justify-center gap-1 sm:gap-1.5 bg-white hover:bg-emerald-50 active:scale-95 text-[#278b4e] font-extrabold text-sm sm:text-base rounded-2xl shadow-lg cursor-pointer border border-white/60 transition-all whitespace-nowrap select-none touch-manipulation">
               <i data-lucide="search" class="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.5]"></i>
               <span>조회</span>
             </button>
-          </div>
-
-          <div id="matchingChipsContainer" class="hidden transition-all">
-            <div id="nicknameChipList" class="w-full"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 하단 주문목록 컨테이너: 상단 영역 고정 하에 남은 높이 전체를 차지하며 이 내부에서만 독립 스크롤 -->
-    <div class="bg-[#34a862] rounded-3xl border border-[#2b9454] shadow-xl flex-1 min-h-0 relative overflow-hidden flex flex-col">
-      <!-- 스크롤 가능 컨테이너 (스크롤바 완전 숨김 및 리스트 영역 전용 터치 스크롤 지원) -->
+    <!-- 하단 주문목록 컨테이너 -->
+    <div class="bg-[#34a862] rounded-3xl border border-[#2b9454] shadow-xl flex-1 min-h-0 relative overflow-hidden flex flex-col z-10">
       <div id="ordersScrollWrapper" class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 no-scrollbar overscroll-contain touch-pan-y">
         <div id="ordersListContainer" class="space-y-4"></div>
       </div>
 
-      <!-- 상하좌우 완벽한 기하학적 정중앙 배치 (초기 대기 상태) -->
-      <div id="initialStatePrompt" class="absolute inset-0 flex items-center justify-center text-emerald-50 pointer-events-none">
+      <!-- 상하좌우 기하학적 정중앙 배치 (초기 대기 상태) -->
+      <div id="initialStatePrompt" class="absolute inset-0 flex items-center justify-center text-emerald-50 pointer-events-none z-0">
         <div class="w-16 h-16 bg-white/15 rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-sm">
           <i data-lucide="user-search" class="w-8 h-8"></i>
         </div>
       </div>
 
-      <div id="emptyResultsState" class="hidden absolute inset-0 p-8 sm:p-12 text-center text-emerald-50 flex flex-col items-center justify-center my-auto">
-        <div class="w-16 h-16 bg-rose-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-rose-200 border border-rose-800/40">
-          <i data-lucide="search-x" class="w-8 h-8"></i>
+      <!-- 검색 결과 없음 안내 -->
+      <div id="emptyResultsState" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-emerald-50 pointer-events-none z-0">
+        <div class="w-16 h-16 bg-white/15 rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-sm mb-3">
+          <i data-lucide="alert-circle" class="w-8 h-8"></i>
         </div>
-        <h3 class="text-base sm:text-lg font-bold text-white">일치하는 닉네임이 없습니다</h3>
-        <p class="text-xs sm:text-sm text-emerald-50 mt-2">주문하신 닉네임으로 다시 입력해주세요</p>
-        <button id="resetAllFiltersBtn" type="button" class="mt-5 px-5 py-2 bg-emerald-900 hover:bg-emerald-950 text-white rounded-xl text-xs font-bold transition-all cursor-pointer">
-          초기화
-        </button>
+        <p class="font-bold text-base sm:text-lg text-white">조회된 주문 내역이 없습니다</p>
+        <p class="text-xs sm:text-sm text-emerald-100 mt-1">닉네임을 다시 확인해 주세요</p>
       </div>
     </div>
   </main>
 
-  <!-- 화면 왼쪽 하단: 갱신 시각 및 컨트롤 버튼 바 -->
-  <div class="fixed bottom-4 sm:bottom-6 left-4 sm:left-6 z-40 flex flex-wrap items-center gap-2 sm:gap-2.5 select-none pointer-events-auto max-w-[calc(100vw-2rem)]">
-    <button id="systemSyncBtn" type="button" class="px-3.5 py-2.5 bg-white/95 backdrop-blur-md border border-emerald-200/80 rounded-2xl shadow-sm text-emerald-800 hover:bg-emerald-50 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold">
-      <i data-lucide="refresh-ccw" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600"></i>
-      <span class="tracking-tight">DB UPDATE</span>
-    </button>
-    <!-- DB UPDATE 버튼 오른쪽에 표시되는 업데이트 일자/시각 (초록색 점 삭제 및 회색 텍스트 적용) -->
-    <div id="dbUpdateTimestampBadge" class="px-2.5 py-1.5 bg-white/95 backdrop-blur-md rounded-2xl shadow-sm flex items-center">
-      <span id="dbUpdateTimestampText" class="font-mono font-medium text-slate-500 text-[11px]">-</span>
+  <!-- [메인 화면 영역 2] 매장 위치 및 주차안내 화면 (이미지 전용 뷰어) -->
+  <main id="storeLocationView" class="hidden max-w-6xl mx-auto px-2 sm:px-4 pt-2 sm:pt-3 pb-4 sm:pb-6 flex-1 w-full flex flex-col min-h-0 overflow-hidden">
+    <div class="bg-white rounded-2xl sm:rounded-3xl border border-emerald-100 shadow-xl flex-1 min-h-0 flex flex-col overflow-hidden relative">
+      <!-- 상단 간결 헤더 바 -->
+      <div class="px-3 sm:px-5 py-2.5 sm:py-3 border-b border-emerald-100/80 flex items-center justify-between bg-white shrink-0">
+        <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/60 shadow-2xs shrink-0">
+            <i data-lucide="map-pin" class="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2]"></i>
+          </div>
+          <div class="min-w-0">
+            <h2 class="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight truncate">매장 위치 및 주차안내</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- 상단 헤더 글자 바로 아래 위치 및 주차 안내 정보 패널 -->
+      <div class="px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-b border-emerald-100 shrink-0 shadow-xs space-y-1.5 select-text">
+        <div class="flex items-start">
+          <p class="text-xs sm:text-sm text-slate-700 font-normal leading-relaxed tracking-normal">
+            <span class="text-slate-500 font-medium mr-1">매장 위치 :</span>서울 송파구 송파대로345 헬리오시티 제근린생활시설2b동 1019호 (가락초 정문 앞)
+          </p>
+        </div>
+        <div class="flex items-start">
+          <p class="text-xs sm:text-sm text-slate-700 font-normal leading-relaxed tracking-normal">
+            <span class="text-slate-500 font-medium mr-1">주차 위치 :</span>헬리오시티상가 2-A 주차장 이용 (무료)
+          </p>
+        </div>
+      </div>
+
+      <!-- 이미지 풀스크린 뷰어 컨테이너 -->
+      <div class="flex-1 min-h-0 w-full p-2 sm:p-4 bg-slate-50/70 overflow-y-auto no-scrollbar space-y-3">
+        <div class="w-full bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs relative overflow-hidden flex items-center justify-center p-1 sm:p-2">
+          <!-- 실제 렌더링되는 안내 이미지 (구글 드라이브 및 로컬 이미지 폴백 지원) -->
+          <img 
+            id="storeMapDriveImage" 
+            src="https://lh3.googleusercontent.com/d/15oiQfJM0KRyzf0lUULhXVi8MDvQfULf-"
+            alt="다이클로 송파헬리오시티점 위치정보 및 주차안내 daiclo_map" 
+            class="w-full h-auto object-contain select-none rounded-xl"
+            onerror="if(this.dataset.fallback !== '1'){ this.dataset.fallback='1'; this.src='daiclo_map.png'; } else if(this.dataset.fallback === '1'){ this.dataset.fallback='2'; this.src='image_ad2d0c.png'; }"
+          />
+
+          <!-- 이미지 미등록 시 안내 박스 (비상용) -->
+          <div id="driveImageEmptyPrompt" class="hidden flex-col items-center justify-center text-center p-6 select-none">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3 border border-emerald-100 shadow-2xs">
+              <i data-lucide="image-off" class="w-8 h-8"></i>
+            </div>
+            <p class="font-extrabold text-slate-800 text-base sm:text-lg">등록된 위치 및 주차안내 이미지가 없습니다</p>
+          </div>
+        </div>
+      </div>
     </div>
+  </main>
+
+  <!-- [메인 화면 영역 3] 보유 쿠폰 (서비스 준비중) 화면 -->
+  <main id="couponsView" class="hidden max-w-6xl mx-auto px-4 sm:px-6 pt-3 sm:pt-5 pb-20 sm:pb-24 flex-1 w-full flex flex-col min-h-0 overflow-hidden">
+    <div class="bg-white rounded-3xl border border-emerald-100 shadow-xl flex-1 flex flex-col items-center justify-center p-8 text-center">
+      <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mb-4 border border-amber-100 shadow-sm">
+        <i data-lucide="ticket" class="w-8 h-8 stroke-[2]"></i>
+      </div>
+      <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold mb-2">
+        <span>서비스 준비 중</span>
+      </div>
+      <h2 class="text-xl font-extrabold text-slate-800 mb-1">보유 쿠폰 서비스</h2>
+      <p class="text-sm text-slate-500 max-w-sm leading-relaxed mb-6">
+        고객님을 위한 쿠폰 및 멤버십 혜택 기능을 준비 중입니다.<br>빠른 시일 내에 찾아뵙겠습니다.
+      </p>
+      <button id="backToOrderFromCouponBtn" type="button" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-md transition-all cursor-pointer touch-manipulation">
+        공동구매 주문조회로 돌아가기
+      </button>
+    </div>
+  </main>
+
+  <!-- 화면 왼쪽 하단: 통합 DB UPDATE 버튼 -->
+  <div id="systemSyncBtnWrapper" class="fixed bottom-4 sm:bottom-6 left-4 sm:left-6 z-30 select-none pointer-events-auto max-w-[calc(100vw-2rem)]">
+    <button id="systemSyncBtn" type="button" title="클릭하여 DB 갱신 (관리자)" aria-label="클릭하여 DB 갱신"
+      class="px-3.5 py-2.5 bg-white/95 backdrop-blur-md border border-emerald-200/90 rounded-2xl shadow-md text-emerald-900 hover:bg-emerald-50 active:scale-95 transition-all flex items-center gap-2 sm:gap-2.5 cursor-pointer text-xs sm:text-sm font-bold touch-manipulation">
+      <div class="flex items-center gap-1.5 text-emerald-700 font-extrabold">
+        <i data-lucide="refresh-ccw" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600"></i>
+        <span class="tracking-tight">DB UPDATE</span>
+      </div>
+      <span class="w-[1px] h-3.5 bg-slate-200"></span>
+      <span id="dbUpdateTimestampText" class="font-mono font-medium text-slate-500 text-[11px] sm:text-xs">-</span>
+    </button>
   </div>
 
   <!-- 닉네임 선택 팝업 모달 -->
-  <div id="nicknameSelectModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[82vh] flex flex-col transform scale-95 transition-transform duration-300 overflow-hidden border border-emerald-100" id="nicknameSelectModalContent">
+  <div id="nicknameSelectModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[82vh] flex flex-col transform scale-95 transition-transform duration-200 overflow-hidden border border-emerald-100" id="nicknameSelectModalContent">
       <div class="p-5 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">
@@ -212,112 +378,61 @@
           <div>
             <h3 class="text-lg font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
               <span>닉네임 선택</span>
-              <span id="nicknameCountBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white">0</span>
             </h3>
             <p class="text-xs text-slate-500 font-medium mt-0.5">조회할 회원의 닉네임을 선택해 주세요</p>
           </div>
         </div>
-        <button id="closeNicknameSelectBtn" type="button" aria-label="닫기" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer">
+        <button id="closeNicknameSelectBtn" type="button" aria-label="닫기" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer touch-manipulation">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <div class="p-4 sm:p-5 overflow-y-auto flex-1 bg-slate-50/40">
+      <div class="p-4 sm:p-5 overflow-y-auto flex-1 bg-slate-50/40 overscroll-contain">
         <div id="modalNicknameList" class="flex flex-col gap-2"></div>
-      </div>
-
-      <div class="p-4 border-t border-slate-100 bg-white flex justify-end">
-        <button id="cancelNicknameSelectBtn" type="button" class="w-full sm:w-auto px-5 py-2.5 text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 active:scale-95 font-bold rounded-xl transition-all cursor-pointer">
-          닫기
-        </button>
       </div>
     </div>
   </div>
 
-  <div id="passwordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300 p-8 text-center" id="passwordModalContent">
+  <!-- 관리자 비밀번호 모달 -->
+  <div id="passwordModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-200 p-8 text-center" id="passwordModalContent">
       <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-4">
         <i data-lucide="lock" class="w-6 h-6"></i>
       </div>
       <h3 class="text-xl font-extrabold text-slate-800 mb-2">관리자 비밀번호</h3>
-      <p class="text-xs text-slate-500 mb-6">내역을 확인하려면 비밀번호를 입력해주세요.</p>
+      <p class="text-xs text-slate-500 mb-6">내역 확인 및 업데이트를 위해 비밀번호를 입력해주세요.</p>
       
-      <input type="password" id="adminPasswordInput" class="w-full border-2 border-emerald-100 bg-slate-50 rounded-xl p-4 text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors mb-6" placeholder="****" maxlength="30">
+      <input type="password" id="adminPasswordInput" class="w-full border-2 border-emerald-100 bg-slate-50 rounded-xl p-4 text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors mb-6 touch-manipulation" placeholder="****" maxlength="30">
       
       <div class="flex gap-2 justify-center">
-        <button id="cancelPasswordBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors">취소</button>
-        <button id="verifyPasswordBtn" type="button" class="flex-1 px-4 py-3 text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl transition-colors">확인</button>
+        <button id="cancelPasswordBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors touch-manipulation cursor-pointer">취소</button>
+        <button id="verifyPasswordBtn" type="button" class="flex-1 px-4 py-3 text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl transition-colors touch-manipulation cursor-pointer">확인</button>
       </div>
     </div>
   </div>
 
-  <div id="historyModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[88vh] flex flex-col transform scale-95 transition-transform duration-300 border border-emerald-100" id="historyModalContent">
-      <div class="p-5 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-3xl">
-        <div class="flex items-center gap-3 text-emerald-800">
-          <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">
-            <i data-lucide="history" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h3 class="text-lg sm:text-xl font-extrabold text-slate-800 tracking-tight">픽업 처리 내역</h3>
-            <p class="text-xs text-slate-500 font-medium mt-0.5">완료 처리된 주문의 상세 정보입니다</p>
-          </div>
-        </div>
-        <button id="closeHistoryBtn" type="button" aria-label="닫기" class="text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-xl transition-colors p-2 cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      
-      <div class="p-4 sm:p-6 overflow-y-auto flex-1 custom-scroll bg-slate-50/60 rounded-b-3xl">
-        <div id="historyListContainer" class="space-y-3.5"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="customAlertModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300 p-8 text-center border border-emerald-100" id="customAlertContent">
-      <div class="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-rose-100">
+  <!-- 안내 알림 모달 -->
+  <div id="customAlertModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-200 p-8 text-center border border-emerald-100" id="customAlertContent">
+      <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-emerald-100">
         <i data-lucide="alert-circle" class="w-7 h-7"></i>
       </div>
       <h3 class="text-xl font-extrabold text-slate-800 mb-3">안내</h3>
       <p id="customAlertMessage" class="text-sm text-slate-600 mb-8 leading-relaxed font-medium"></p>
       
-      <button id="closeAlertBtn" type="button" class="w-full px-4 py-3.5 text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 font-bold rounded-xl transition-all shadow-md">
+      <button id="closeAlertBtn" type="button" class="w-full px-4 py-3.5 text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 font-bold rounded-xl transition-all shadow-md touch-manipulation cursor-pointer">
         확인
       </button>
     </div>
   </div>
 
-  <div id="customConfirmModal" class="fixed inset-0 z-[65] flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300 p-8 text-center border border-emerald-100" id="customConfirmContent">
-      <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-100">
-        <i data-lucide="help-circle" class="w-7 h-7"></i>
-      </div>
-      <h3 class="text-xl font-extrabold text-slate-800 mb-2">확인</h3>
-      <p id="customConfirmMessage" class="text-xs sm:text-sm text-slate-600 mb-6 leading-relaxed font-medium"></p>
-      <div class="flex gap-2">
-        <button id="customConfirmCancelBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors">
-          취소
-        </button>
-        <button id="customConfirmOkBtn" type="button" class="flex-1 px-4 py-3 text-white bg-rose-600 hover:bg-rose-700 active:scale-95 font-bold rounded-xl transition-colors shadow-sm">
-          삭제하기
-        </button>
-      </div>
-    </div>
-  </div>
-
+  <!-- 토스트 알림 컴포넌트 -->
   <div id="toastNotification" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl text-white text-sm font-bold bg-emerald-600 transform translate-y-20 opacity-0 pointer-events-none">
     <div id="toastIcon"></div>
     <span id="toastMessage"></span>
   </div>
 
-  <iframe id="appsScriptHiddenTarget" name="appsScriptHiddenTarget" style="display:none; width:0; height:0; border:0;"></iframe>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+  <script>
     let ordersData = [];
     let searchQuery = "";
     let activeSelectedNickname = "";
@@ -325,11 +440,7 @@
     let adminPassword = "0718";
 
     const SHEET_ID = "11OG6u2i64D6exMiBgqGbkq-wrmxrYrVfLSzbYsBoXC8";
-    const APPS_SCRIPT_SYNC_URL = "https://script.google.com/macros/s/AKfycbyvRsB4cUdnC0DgFz4TJcgmN7_YCf-4dO0MG4SMP0JsDb5BNLZLEY1bPxpA2YKuboAC/exec";
-
-    let db = null;
-    let auth = null;
-    let currentUser = null;
+    const DEFAULT_MAP_IMAGE = "https://lh3.googleusercontent.com/d/15oiQfJM0KRyzf0lUULhXVi8MDvQfULf-";
 
     const SAMPLE_INITIAL_ORDERS = [
       { id: 'ORD-2', sheetRowIndex: 2, orderDate: '2026.09.08', pickupDate: '2026.09.11', nickname: '헬리오1234', productName: 'DAICLO 프리미엄 에어로 쿨링 셔츠', quantity: 2, amount: 58000, status: '픽업예정' },
@@ -338,25 +449,81 @@
       { id: 'ORD-5', sheetRowIndex: 5, orderDate: '2026.09.10', pickupDate: '2026.09.12', nickname: '1234', productName: '데일리 오가닉 코튼 티셔츠 3팩', quantity: 1, amount: 29900, status: '픽업예정' }
     ];
 
-    async function initCloudSync() {
-      try {
-        if (typeof __firebase_config === 'undefined') return;
+    // IndexedDB 대용량 영구 저장소 함수
+    const DB_NAME = "DaicloStoreDB";
+    const STORE_NAME = "store_assets";
+    const MAP_KEY = "daiclo_store_map_image";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          const cred = await signInWithCustomToken(auth, __initial_auth_token);
-          currentUser = cred.user;
-        } else {
-          const cred = await signInAnonymously(auth);
-          currentUser = cred.user;
+    function getMapDB() {
+      return new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          reject(new Error("IndexedDB not supported"));
+          return;
         }
-      } catch (err) {
-        console.warn("Init cloud sync failed:", err);
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME);
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function savePersistentMapImage(dataUrl) {
+      try {
+        const db = await getMapDB();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        tx.objectStore(STORE_NAME).put(dataUrl, MAP_KEY);
+        await new Promise((res, rej) => {
+          tx.oncomplete = res;
+          tx.onerror = rej;
+        });
+      } catch (e) {
+        console.warn("IndexedDB save error, fallbacking to localStorage:", e);
       }
+      try {
+        localStorage.setItem("daiclo_custom_store_map", dataUrl);
+      } catch (_) {}
+    }
+
+    async function loadPersistentMapImage() {
+      try {
+        const db = await getMapDB();
+        const tx = db.transaction(STORE_NAME, "readonly");
+        const req = tx.objectStore(STORE_NAME).get(MAP_KEY);
+        const result = await new Promise((res) => {
+          req.onsuccess = () => res(req.result);
+          req.onerror = () => res(null);
+        });
+        if (result) return result;
+      } catch (e) {
+        console.warn("IndexedDB load error, checking localStorage:", e);
+      }
+      try {
+        return localStorage.getItem("daiclo_custom_store_map");
+      } catch (_) {
+        return null;
+      }
+    }
+
+    async function fetchSheetGvizData(sheetName) {
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
+        const res = await fetch(url, { cache: 'no-cache' });
+        if (!res.ok) return null;
+        const text = await res.text();
+        const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);?$/);
+        if (jsonMatch && jsonMatch[1]) {
+          const parsed = JSON.parse(jsonMatch[1]);
+          if (parsed && parsed.status === 'ok') {
+            return parsed;
+          }
+        }
+      } catch (err) {}
+      return null;
     }
 
     function showToast(message, type = "success") {
@@ -385,61 +552,17 @@
       }, 3000);
     }
 
-    function updateNicknameChips() {
-      const container = document.getElementById("matchingChipsContainer");
-      const chipContainer = document.getElementById("nicknameChipList");
-      if (!container || !chipContainer) return;
-      
-      chipContainer.innerHTML = "";
-
-      // 선택된 회원이 있을 때만 상단에 표시
-      if (activeSelectedNickname) {
-        container.classList.remove("hidden");
-
-        const selectedBadge = document.createElement("div");
-        selectedBadge.className = "inline-flex items-center gap-2.5 bg-white text-slate-900 pl-3.5 pr-2 py-1.5 sm:py-2 rounded-full shadow-lg border border-emerald-100 transition-all animate-in fade-in duration-200";
-        selectedBadge.innerHTML = `
-          <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-            <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
-          </div>
-          <span class="text-xs font-bold text-emerald-800 select-none">선택 회원</span>
-          <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight">${escapeHtml(activeSelectedNickname)}</span>
-          <button type="button" id="deselectNicknameBtn" title="선택 해제 및 목록 다시보기" aria-label="선택 해제" class="ml-1 w-6 h-6 rounded-full hover:bg-slate-100 active:scale-90 flex items-center justify-center text-slate-400 hover:text-slate-800 transition-all cursor-pointer">
-            <i data-lucide="x" class="w-4 h-4 stroke-[2.5]"></i>
-          </button>
-        `;
-
-        const deselectBtn = selectedBadge.querySelector("#deselectNicknameBtn");
-        if (deselectBtn) {
-          deselectBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            activeSelectedNickname = "";
-            render();
-          });
-        }
-
-        chipContainer.appendChild(selectedBadge);
-        if (window.lucide) lucide.createIcons();
-        return;
-      }
-
-      container.classList.add("hidden");
-    }
-
     function openNicknameSelectModal(nicknames) {
       const modal = document.getElementById("nicknameSelectModal");
       const modalContent = document.getElementById("nicknameSelectModalContent");
       const listElem = document.getElementById("modalNicknameList");
-      const countBadge = document.getElementById("nicknameCountBadge");
       if (!modal || !modalContent || !listElem) return;
 
       listElem.innerHTML = "";
-      if (countBadge) countBadge.textContent = nicknames.length;
-
       nicknames.forEach(nick => {
         const itemBtn = document.createElement("button");
         itemBtn.type = "button";
-        itemBtn.className = "w-full text-left px-4 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 active:scale-[0.99] border border-slate-200/80 hover:border-emerald-300 shadow-xs flex items-center justify-between transition-all group cursor-pointer";
+        itemBtn.className = "w-full text-left px-4 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 active:scale-[0.99] border border-slate-200/80 hover:border-emerald-300 shadow-xs flex items-center justify-between transition-all group cursor-pointer touch-manipulation";
         itemBtn.innerHTML = `
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-8 h-8 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 transition-colors">
@@ -452,17 +575,16 @@
             <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"></i>
           </div>
         `;
-
         itemBtn.addEventListener("click", () => {
           closeNicknameSelectModal();
           selectNickname(nick);
         });
-
         listElem.appendChild(itemBtn);
       });
 
       if (window.lucide) lucide.createIcons();
-
+      modal.classList.remove("hidden");
+      void modal.offsetWidth;
       modal.classList.remove("opacity-0", "pointer-events-none");
       modalContent.classList.remove("scale-95");
     }
@@ -471,17 +593,19 @@
       const modal = document.getElementById("nicknameSelectModal");
       const modalContent = document.getElementById("nicknameSelectModalContent");
       if (!modal || !modalContent) return;
-
       modal.classList.add("opacity-0", "pointer-events-none");
       modalContent.classList.add("scale-95");
+      setTimeout(() => { modal.classList.add("hidden"); }, 200);
     }
 
     function selectNickname(nick) {
       const searchInput = document.getElementById("nicknameSearchInput");
       activeSelectedNickname = nick;
       searchQuery = nick;
-
-      if (searchInput) searchInput.value = nick;
+      if (searchInput) {
+        searchInput.value = nick;
+        searchInput.blur();
+      }
       const clearBtn = document.getElementById("clearSearchBtn");
       if (clearBtn) clearBtn.classList.remove("hidden");
       render();
@@ -502,8 +626,8 @@
       const input = document.getElementById("nicknameSearchInput");
       const val = input ? input.value.trim() : "";
       if (!val) {
-        if (typeof showAlert === "function") {
-          showAlert("검색할 닉네임을 입력해 주세요.");
+        if (typeof window.showAlert === "function") {
+          window.showAlert("검색할 닉네임을 입력해 주세요.");
         } else {
           showToast("검색할 닉네임을 입력해 주세요.", "error");
         }
@@ -514,15 +638,30 @@
       const allNicknames = [...new Set(ordersData.map(o => (o.nickname || "").trim()).filter(Boolean))];
       const matching = allNicknames.filter(n => n.toLowerCase().includes(val.toLowerCase()));
 
-      // 한글 및 숫자 자연 오름차순 정렬 (숫자 크기 및 가나다 순)
-      matching.sort((a, b) => a.localeCompare(b, "ko", { numeric: true, sensitivity: "base" }));
+      const getCategory = (str) => {
+        const trimmed = (str || "").trim();
+        if (!trimmed) return 9;
+        const firstChar = trimmed[0];
+        if (/[가-힣ㄱ-ㅎㅏ-ㅣ]/.test(firstChar)) return 1;
+        if (/[a-zA-Z]/.test(firstChar)) return 2;
+        if (/[0-9]/.test(firstChar)) return 3;
+        return 4;
+      };
+
+      matching.sort((a, b) => {
+        const cleanA = (a || "").trim();
+        const cleanB = (b || "").trim();
+        const catA = getCategory(cleanA);
+        const catB = getCategory(cleanB);
+        if (catA !== catB) return catA - catB;
+        return cleanA.localeCompare(cleanB, "ko", { numeric: true, sensitivity: "base" });
+      });
 
       multiNicknameChoices = matching;
-
       if (matching.length === 0) {
         activeSelectedNickname = "";
         render();
-        showToast("일치하는 닉네임이 없습니다. 주문하신 닉네임으로 다시 입력해주세요", "error");
+        showToast("일치하는 닉네임이 없습니다. 다시 입력해 주세요.", "error");
       } else {
         openNicknameSelectModal(matching);
       }
@@ -539,7 +678,6 @@
       if (!activeSelectedNickname) {
         initial.classList.remove("hidden");
         empty.classList.add("hidden");
-        
         if (searchQuery && multiNicknameChoices.length === 0) {
           initial.classList.add("hidden");
           empty.classList.remove("hidden");
@@ -556,34 +694,24 @@
       }
       empty.classList.add("hidden");
 
-      // 날짜 문자열(예: '2026. 9. 9', '2026.09.09')을 타임스탬프로 안전하게 변환
       const parseDateToTime = (dateStr) => {
         const parts = String(dateStr || "").match(/\d+/g);
         if (!parts || parts.length < 3) return 0;
         return new Date(parts[0], parseInt(parts[1], 10) - 1, parts[2]).getTime() || 0;
       };
 
-      // 1순위: '픽업 전' 주문 우선 배치, '픽업 완료'는 아래로
-      // 2순위: 주문일자 최신순(내림차순)
-      // 3순위: 동일 날짜의 경우 최신 행(row) 순서
       filtered.sort((a, b) => {
         const isCompleteA = a.status === "완료" || a.status === "1";
         const isCompleteB = b.status === "완료" || b.status === "1";
-
-        if (isCompleteA !== isCompleteB) {
-          return isCompleteA ? 1 : -1;
-        }
-
+        if (isCompleteA !== isCompleteB) return isCompleteA ? 1 : -1;
         const timeA = parseDateToTime(a.orderDate);
         const timeB = parseDateToTime(b.orderDate);
         if (timeB !== timeA) return timeB - timeA;
-
         return (b.sheetRowIndex || 0) - (a.sheetRowIndex || 0);
       });
 
       filtered.forEach((order) => {
         const isComplete = order.status === "완료" || order.status === "1";
-
         const itemCard = document.createElement("div");
         itemCard.className = `rounded-2xl transition-all px-4 py-3 sm:py-3.5 flex flex-col gap-2 ${
           isComplete 
@@ -594,7 +722,6 @@
         const unitPrice = order.unitPrice || (order.quantity > 0 ? Math.round(order.amount / order.quantity) : order.amount);
 
         itemCard.innerHTML = `
-          <!-- 첫번째줄: 품목 / 단가 / 수량 / 가격 -->
           <div class="min-w-0 flex items-center flex-wrap gap-1.5 sm:gap-2.5 text-sm sm:text-base md:text-lg font-bold ${isComplete ? 'text-emerald-950/80' : 'text-black'}">
             <span class="truncate max-w-[240px] sm:max-w-md md:max-w-lg font-bold ${isComplete ? 'text-emerald-950/85' : 'text-black'}" title="${escapeHtml(order.productName || '상품명 없음')}">
               ${escapeHtml(order.productName || "상품명 없음")}
@@ -607,7 +734,6 @@
             <span class="${isComplete ? 'text-emerald-950/90' : 'text-emerald-950'} font-extrabold whitespace-nowrap">${Number(order.amount).toLocaleString()}원</span>
           </div>
 
-          <!-- 두번째줄: 주문일자, 픽업예정일자, 주문상태값 -->
           <div class="flex items-center justify-between flex-wrap gap-2 pt-1 border-t ${isComplete ? 'border-emerald-900/20 text-emerald-950/70' : 'border-emerald-100 text-emerald-900'} text-xs sm:text-sm font-medium">
             <div class="flex items-center gap-2.5 sm:gap-3.5 flex-wrap">
               <span>주문일자: ${escapeHtml(order.orderDate || "-")}</span>
@@ -635,110 +761,8 @@
     }
 
     function render() {
-      updateNicknameChips();
       renderOrders();
     }
-
-    window.processPickup = function(orderId) {
-      const order = ordersData.find(o => o.id === orderId);
-      if (!order) {
-        showToast("주문을 찾을 수 없습니다.", "error");
-        return;
-      }
-
-      if (order._processing) return;
-      order._processing = true;
-
-      const now = new Date();
-      const pad = (n) => String(n).padStart(2, "0");
-      const formattedTimestamp = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-
-      order.status = "완료";
-      order.completedAt = formattedTimestamp;
-      order.processedTime = formattedTimestamp;
-
-      try {
-        localStorage.setItem(`daiclo_completed_${order.id}`, formattedTimestamp);
-        if (order.sheetRowIndex) {
-          localStorage.setItem(`daiclo_completed_row_${order.sheetRowIndex}`, formattedTimestamp);
-        }
-      } catch (_) {}
-
-      render();
-
-      const callbackName = "cb_as_" + Date.now();
-      window[callbackName] = function(res) {
-        delete window[callbackName];
-        console.log("Apps Script 수신 결과:", res);
-        showToast(`[${order.nickname}] 시트 업데이트 완료 (${formattedTimestamp})`, "success");
-      };
-
-      const payload = {
-        action: 'updatePickup',
-        method: 'updatePickup',
-        functionName: 'testDirect',
-        callback: callbackName,
-        sheetName: '주문데이터',
-        targetSheet: '주문데이터',
-        sheetRowIndex: String(order.sheetRowIndex || ''),
-        row: String(order.sheetRowIndex || ''),
-        col: '8',
-        statusCol: 'H',
-        status: '완료',
-        newStatus: '완료',
-        timeCol: '9',
-        pickupTimeCol: 'I',
-        timeColLetter: 'I',
-        pickupTime: formattedTimestamp,
-        pickupCheckTime: formattedTimestamp,
-        time: formattedTimestamp,
-        processedTime: formattedTimestamp,
-        orderId: String(order.id || ''),
-        nickname: String(order.nickname || ''),
-        _t: String(Date.now())
-      };
-
-      try {
-        const queryParams = new URLSearchParams(payload).toString();
-        const targetUrl = APPS_SCRIPT_SYNC_URL + (APPS_SCRIPT_SYNC_URL.includes('?') ? '&' : '?') + queryParams;
-
-        try {
-          const sTag = document.createElement('script');
-          sTag.src = targetUrl;
-          sTag.onload = () => { if (sTag.parentNode) sTag.parentNode.removeChild(sTag); };
-          sTag.onerror = () => { 
-            console.warn("Script tag error, fallbacking to fetch/beacon");
-            if (sTag.parentNode) sTag.parentNode.removeChild(sTag); 
-          };
-          document.body.appendChild(sTag);
-        } catch (_) {}
-
-        fetch(targetUrl, {
-          method: 'GET',
-          mode: 'no-cors',
-          cache: 'no-cache',
-          keepalive: true
-        }).catch(() => {});
-
-        const beaconImg = new Image();
-        beaconImg.src = targetUrl;
-
-        const hiddenIframe = document.getElementById('appsScriptHiddenTarget');
-        if (hiddenIframe) {
-          hiddenIframe.src = targetUrl;
-        }
-
-        showToast(`[${order.nickname}] 완료 처리됨 (${formattedTimestamp})`, 'success');
-      } catch (e) {
-        console.error('Apps Script 호출 실패:', e);
-        showToast(`[${order.nickname}] 전송 오류 발생`, 'error');
-        order.status = '픽업예정';
-        order.completedAt = null;
-        order.processedTime = null;
-        order._processing = false;
-        render();
-      }
-    };
 
     function processRawMatrix(matrix) {
       if (!matrix || matrix.length === 0) return [];
@@ -752,14 +776,7 @@
         }
       }
 
-      let colOrderDate = 0;
-      let colPickupDate = 1;
-      let colNickname = 2;
-      let colProduct = 3;
-      let colQty = 4;
-      let colAmount = 6;
-      let colStatus = 7;
-      let colTimestampIdx = 8;
+      let colOrderDate = 0, colPickupDate = 1, colNickname = 2, colProduct = 3, colQty = 4, colAmount = 6, colStatus = 7, colTimestampIdx = 8;
 
       if (headerRowIndex >= 0) {
         const headers = matrix[headerRowIndex].map(h => String(h || "").trim());
@@ -771,7 +788,7 @@
           else if (h.includes("수량")) colQty = idx;
           else if (h.includes("금액") || h.includes("결제")) colAmount = idx;
           else if (h.includes("상태") || h.includes("픽업상태")) colStatus = idx;
-          else if (h.includes("체크시각") || h.includes("픽업시각") || h.includes("완료시각") || h.includes("시각")) colTimestampIdx = idx;
+          else if (h.includes("시각")) colTimestampIdx = idx;
         });
       }
 
@@ -788,226 +805,161 @@
         const statusRaw = (row[colStatus] !== undefined ? row[colStatus] : row[7] || "").toString().trim();
         const status = (statusRaw === "완료" || statusRaw.includes("완료") || statusRaw === "1") ? "완료" : "픽업예정";
 
-        const sheetRow = i + 2;
-        const orderId = `ORD-${sheetRow}`;
-        let savedTimestamp = "";
-        try {
-          savedTimestamp = localStorage.getItem(`daiclo_completed_${orderId}`) || 
-                           localStorage.getItem(`daiclo_completed_row_${sheetRow}`) || "";
-        } catch (_) {}
-
-        const colTimestamp = (row[colTimestampIdx] !== undefined ? row[colTimestampIdx] : (row[8] || "")).toString().trim();
-        const finalTimestamp = colTimestamp || savedTimestamp || null;
-
         results.push({
-          id: orderId,
-          sheetRowIndex: sheetRow,
+          id: `ORD-${i + 2}`,
+          sheetRowIndex: i + 2,
           orderDate: (row[colOrderDate] || "").toString().trim() || "-",
           pickupDate: (row[colPickupDate] || "").toString().trim() || "-",
           nickname: nickname,
           productName: (row[colProduct] || "").toString().trim(),
           quantity: parseInt((row[colQty] || "1").toString().replace(/[^0-9]/g, "")) || 1,
           amount: parseFloat((row[colAmount] || row[5] || "0").toString().replace(/[^0-9]/g, "")) || 0,
-          status: status,
-          completedAt: status === "완료" ? finalTimestamp : null,
-          processedTime: status === "완료" ? finalTimestamp : null
+          status: status
         });
       }
       return results;
     }
 
-    function loadSettingsSheetData() {
-      const callbackName = "cb_settings_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-      const script = document.createElement("script");
-      let timeoutHandler = null;
+    async function loadSettingsSheetData() {
+      const fetchedData = await fetchSheetGvizData("설정");
+      if (fetchedData && fetchedData.table && fetchedData.table.rows && fetchedData.table.rows.length > 0) {
+        parseSettingsData(fetchedData);
+      }
+    }
 
-      window[callbackName] = function(data) {
-        if (timeoutHandler) clearTimeout(timeoutHandler);
-        if (script.parentNode) script.parentNode.removeChild(script);
-        delete window[callbackName];
-
-        try {
-          if (data && data.table && data.table.rows && data.table.rows.length > 0) {
-            const matrix = data.table.rows.map(row => (row.c || []).map(c => c ? (c.f !== undefined && c.f !== null ? c.f : (c.v !== undefined && c.v !== null ? c.v : "")) : ""));
-            
-            let foundPassword = "";
-
-            for (let r = 0; r < matrix.length; r++) {
-              for (let c = 0; c < matrix[r].length; c++) {
-                const cellVal = String(matrix[r][c] || "").trim();
-                if (cellVal.includes("비밀번호") || cellVal.toLowerCase().includes("password") || cellVal.includes("패스워드")) {
-                  if (matrix[r][c + 1] !== undefined && String(matrix[r][c + 1]).trim() !== "") {
-                    foundPassword = String(matrix[r][c + 1]).trim();
-                    break;
-                  }
-                  if (r + 1 < matrix.length && matrix[r + 1][c] !== undefined && String(matrix[r + 1][c]).trim() !== "") {
-                    foundPassword = String(matrix[r + 1][c]).trim();
-                    break;
-                  }
+    function parseSettingsData(data) {
+      try {
+        if (data && data.table && data.table.rows && data.table.rows.length > 0) {
+          const matrix = data.table.rows.map(row => (row.c || []).map(c => c ? (c.f !== undefined && c.f !== null ? c.f : (c.v !== undefined && c.v !== null ? c.v : "")) : ""));
+          let foundPassword = "";
+          for (let r = 0; r < matrix.length; r++) {
+            for (let c = 0; c < matrix[r].length; c++) {
+              const cellVal = String(matrix[r][c] || "").trim();
+              if (cellVal.includes("비밀번호") || cellVal.toLowerCase().includes("password") || cellVal.includes("패스워드")) {
+                if (matrix[r][c + 1] !== undefined && String(matrix[r][c + 1]).trim() !== "") {
+                  foundPassword = String(matrix[r][c + 1]).trim();
+                  break;
                 }
               }
-              if (foundPassword) break;
             }
-
-            if (!foundPassword && matrix.length > 0) {
-              if (matrix.length > 1 && matrix[1][0] !== undefined && String(matrix[1][0]).trim() !== "") {
-                foundPassword = String(matrix[1][0]).trim();
-              } else if (matrix[0][1] !== undefined && String(matrix[0][1]).trim() !== "") {
-                foundPassword = String(matrix[0][1]).trim();
-              }
-            }
-
-            if (foundPassword) {
-              adminPassword = String(foundPassword).trim();
-            }
+            if (foundPassword) break;
           }
-        } catch (err) {
-          console.warn("Settings sheet parse error:", err);
+          if (foundPassword) adminPassword = String(foundPassword).trim();
         }
-      };
-
-      timeoutHandler = setTimeout(() => {
-        if (window[callbackName]) {
-          delete window[callbackName];
-          if (script.parentNode) script.parentNode.removeChild(script);
-        }
-      }, 3500);
-
-      script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent("설정")}&tqx=responseHandler:${callbackName}`;
-      script.onerror = () => {
-        if (timeoutHandler) clearTimeout(timeoutHandler);
-        if (window[callbackName]) {
-          delete window[callbackName];
-          if (script.parentNode) script.parentNode.removeChild(script);
-        }
-      };
-      document.body.appendChild(script);
+      } catch (err) {}
     }
 
     let isUserDbUpdateRequested = false;
 
-    function loadGoogleSheetData(isSilent = false) {
-      if(!isSilent) showToast("데이터 갱신 중...", "info");
+    async function loadGoogleSheetData(isSilent = false) {
+      if (!isSilent) showToast("데이터 갱신 중...", "info");
+
+      const fetchedData = await fetchSheetGvizData("주문데이터");
+      if (fetchedData && fetchedData.table && fetchedData.table.rows) {
+        applyOrdersData(fetchedData);
+        return;
+      }
       
       const callbackName = "cb_" + Date.now() + "_" + Math.floor(Math.random()*1000);
+      window._currentGvizCallback = callbackName;
       const script = document.createElement("script");
       let timeoutHandler = null;
       
       window[callbackName] = function(data) {
         if (timeoutHandler) clearTimeout(timeoutHandler);
-        if(script.parentNode) script.parentNode.removeChild(script);
+        if (script.parentNode) script.parentNode.removeChild(script);
         delete window[callbackName];
-        
-        if (data && data.table && data.table.rows) {
-          const matrix = data.table.rows.map(row => (row.c || []).map(c => c ? (c.f || c.v || "") : ""));
-          const parsed = processRawMatrix(matrix);
-          ordersData = parsed.length > 0 ? parsed : SAMPLE_INITIAL_ORDERS;
-
-          const now = new Date();
-          const pad = (n) => String(n).padStart(2, "0");
-          const formattedNow = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-          const timeTextElem = document.getElementById("dbUpdateTimestampText");
-          if (timeTextElem) {
-            timeTextElem.textContent = formattedNow;
-          }
-          
-          render();
-
-          if (isUserDbUpdateRequested) {
-            isUserDbUpdateRequested = false;
-            if (typeof window.showAlert === "function") {
-              window.showAlert("<strong>DB UPDATE가 정상적으로 완료되었습니다.</strong><br><span class='text-xs text-slate-500 mt-1.5 block font-normal'>구글 시트의 최신 주문 데이터가 성공적으로 반영되었습니다.</span>");
-            } else {
-              showToast("DB UPDATE가 완료되었습니다.", "success");
-            }
-          }
-        }
+        if (window._currentGvizCallback === callbackName) window._currentGvizCallback = null;
+        applyOrdersData(data);
       };
 
-      // 타임아웃 발생 시 로컬 샘플 데이터로 복구 보장
       timeoutHandler = setTimeout(() => {
         if (window[callbackName]) {
           delete window[callbackName];
+          if (window._currentGvizCallback === callbackName) window._currentGvizCallback = null;
           if (script.parentNode) script.parentNode.removeChild(script);
           if (ordersData.length === 0) {
             ordersData = [...SAMPLE_INITIAL_ORDERS];
             render();
           }
-          const now = new Date();
-          const pad = (n) => String(n).padStart(2, "0");
-          const formattedNow = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-          const timeTextElem = document.getElementById("dbUpdateTimestampText");
-          if (timeTextElem) {
-            timeTextElem.textContent = `${formattedNow} (캐시)`;
-          }
-
-          if (isUserDbUpdateRequested) {
-            isUserDbUpdateRequested = false;
-            if (typeof window.showAlert === "function") {
-              window.showAlert("<strong>DB UPDATE가 완료되었습니다.</strong><br><span class='text-xs text-slate-500 mt-1.5 block font-normal'>최신 캐시 데이터가 반영되었습니다.</span>");
-            }
-          }
         }
       }, 3500);
 
-      // 구글 스프레드시트의 '주문데이터' 탭을 명시적으로 호출
       script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent("주문데이터")}&tqx=responseHandler:${callbackName}`;
       script.onerror = () => {
         if (timeoutHandler) clearTimeout(timeoutHandler);
-        const fallbackScript = document.createElement("script");
-        fallbackScript.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:${callbackName}`;
-        document.body.appendChild(fallbackScript);
+        if (window[callbackName]) delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
       };
       document.body.appendChild(script);
     }
 
+    function applyOrdersData(data) {
+      if (data && data.table && data.table.rows) {
+        const matrix = data.table.rows.map(row => (row.c || []).map(c => c ? (c.f || c.v || "") : ""));
+        const parsed = processRawMatrix(matrix);
+        ordersData = parsed.length > 0 ? parsed : SAMPLE_INITIAL_ORDERS;
+
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        const formattedNow = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        const timeTextElem = document.getElementById("dbUpdateTimestampText");
+        if (timeTextElem) timeTextElem.textContent = formattedNow;
+        
+        render();
+
+        if (isUserDbUpdateRequested) {
+          isUserDbUpdateRequested = false;
+          if (typeof window.showAlert === "function") {
+            window.showAlert("<strong>DB UPDATE가 정상적으로 완료되었습니다.</strong><br><span class='text-xs text-slate-500 mt-1.5 block font-normal'>구글 시트의 최신 주문 데이터가 성공적으로 반영되었습니다.</span>");
+          } else {
+            showToast("DB UPDATE가 완료되었습니다.", "success");
+          }
+        }
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       ordersData = [...SAMPLE_INITIAL_ORDERS];
-      
-      initCloudSync();
       loadSettingsSheetData();
       loadGoogleSheetData(false);
 
-      function resetToHomeScreen(isManual = false) {
-        clearSelectedNickname();
-        
-        if (typeof togglePwModal === "function") togglePwModal(false);
-        const customAlertModal = document.getElementById("customAlertModal");
-        if (customAlertModal) customAlertModal.classList.add("opacity-0", "pointer-events-none");
-        const customConfirmModal = document.getElementById("customConfirmModal");
-        if (customConfirmModal) customConfirmModal.classList.add("opacity-0", "pointer-events-none");
+      const storeMapDriveImage = document.getElementById("storeMapDriveImage");
+      const driveImageEmptyPrompt = document.getElementById("driveImageEmptyPrompt");
 
+      function displayStoreMap(imgUrl) {
+        if (!storeMapDriveImage || !driveImageEmptyPrompt) return;
+        if (imgUrl && imgUrl.trim() !== "") {
+          storeMapDriveImage.src = imgUrl;
+          storeMapDriveImage.classList.remove("hidden");
+          driveImageEmptyPrompt.classList.add("hidden");
+        } else {
+          storeMapDriveImage.src = DEFAULT_MAP_IMAGE;
+          storeMapDriveImage.classList.remove("hidden");
+          driveImageEmptyPrompt.classList.add("hidden");
+        }
+      }
+
+      displayStoreMap(DEFAULT_MAP_IMAGE);
+
+      function resetToHomeScreen(isManual = false) {
+        switchView("order");
+        closeSideMenu();
+        clearSelectedNickname();
+        togglePwModal(false);
+        const customAlertModal = document.getElementById("customAlertModal");
+        if (customAlertModal) {
+          customAlertModal.classList.add("opacity-0", "pointer-events-none");
+          setTimeout(() => customAlertModal.classList.add("hidden"), 200);
+        }
         loadSettingsSheetData();
         loadGoogleSheetData(true);
-
-        if (isManual) {
-          showToast("홈 화면으로 새로고침되었습니다.", "info");
-        }
+        if (isManual) showToast("홈 화면으로 새로고침되었습니다.", "info");
       }
 
-      const manualHomeRefreshBtn = document.getElementById("manualHomeRefreshBtn");
-      if (manualHomeRefreshBtn) {
-        manualHomeRefreshBtn.addEventListener("click", () => {
-          resetToHomeScreen(true);
-        });
-      }
-
-      const headerLogoBtn = document.getElementById("headerLogoBtn");
-      if (headerLogoBtn) {
-        headerLogoBtn.addEventListener("click", () => {
-          resetToHomeScreen(true);
-        });
-      }
-
-      const AUTO_HOME_REFRESH_INTERVAL = 10 * 60 * 1000;
-      setInterval(() => {
-        const homeBtn = document.getElementById("manualHomeRefreshBtn");
-        if (homeBtn) {
-          homeBtn.click();
-        } else {
-          resetToHomeScreen(false);
-        }
-      }, AUTO_HOME_REFRESH_INTERVAL);
+      document.getElementById("manualHomeRefreshBtn")?.addEventListener("click", () => resetToHomeScreen(true));
+      document.getElementById("headerLogoBtn")?.addEventListener("click", (e) => { e.stopPropagation(); resetToHomeScreen(true); });
+      document.getElementById("headerHomeClickArea")?.addEventListener("click", () => resetToHomeScreen(true));
 
       const customAlertModal = document.getElementById("customAlertModal");
       const customAlertContent = document.getElementById("customAlertContent");
@@ -1016,70 +968,29 @@
       window.showAlert = function(message) {
         if (!customAlertModal || !customAlertContent || !customAlertMessage) return;
         customAlertMessage.innerHTML = message;
+        customAlertModal.classList.remove("hidden");
+        void customAlertModal.offsetWidth;
         customAlertModal.classList.remove("opacity-0", "pointer-events-none");
         customAlertContent.classList.remove("scale-95");
         if (window.lucide) lucide.createIcons();
       };
 
-      const closeAlertBtn = document.getElementById("closeAlertBtn");
-      if (closeAlertBtn) {
-        closeAlertBtn.addEventListener("click", () => {
-          customAlertModal.classList.add("opacity-0", "pointer-events-none");
-          customAlertContent.classList.add("scale-95");
-        });
-      }
+      document.getElementById("closeAlertBtn")?.addEventListener("click", () => {
+        customAlertModal.classList.add("opacity-0", "pointer-events-none");
+        customAlertContent.classList.add("scale-95");
+        setTimeout(() => customAlertModal.classList.add("hidden"), 200);
+      });
 
-      const customConfirmModal = document.getElementById("customConfirmModal");
-      const customConfirmContent = document.getElementById("customConfirmContent");
-      const customConfirmMessage = document.getElementById("customConfirmMessage");
-      const customConfirmOkBtn = document.getElementById("customConfirmOkBtn");
-      const customConfirmCancelBtn = document.getElementById("customConfirmCancelBtn");
-      let currentConfirmCallback = null;
-
-      window.showCustomConfirm = function(message, onConfirm) {
-        if (!customConfirmModal) return;
-        customConfirmMessage.textContent = message;
-        currentConfirmCallback = onConfirm;
-        customConfirmModal.classList.remove("opacity-0", "pointer-events-none");
-        customConfirmContent.classList.remove("scale-95");
-        if (window.lucide) lucide.createIcons();
-      };
-
-      const closeConfirmModal = () => {
-        customConfirmModal.classList.add("opacity-0", "pointer-events-none");
-        customConfirmContent.classList.add("scale-95");
-        currentConfirmCallback = null;
-      };
-
-      if (customConfirmCancelBtn) customConfirmCancelBtn.addEventListener("click", closeConfirmModal);
-      if (customConfirmOkBtn) {
-        customConfirmOkBtn.addEventListener("click", () => {
-          if (typeof currentConfirmCallback === "function") {
-            currentConfirmCallback();
-          }
-          closeConfirmModal();
-        });
-      }
-
-      const searchBtn = document.getElementById("searchNicknameBtn");
+      document.getElementById("searchNicknameBtn")?.addEventListener("click", executeNicknameSearch);
       const searchInput = document.getElementById("nicknameSearchInput");
-      const clearBtn = document.getElementById("clearSearchBtn");
-      const resetBtn = document.getElementById("resetAllFiltersBtn");
-
-      if (searchBtn) searchBtn.addEventListener("click", executeNicknameSearch);
       if (searchInput) {
         searchInput.addEventListener("keydown", e => { if (e.key === "Enter") executeNicknameSearch(); });
         searchInput.addEventListener("input", e => {
-          if (clearBtn) clearBtn.classList.toggle("hidden", !e.target.value);
+          document.getElementById("clearSearchBtn")?.classList.toggle("hidden", !e.target.value);
         });
       }
-      if (clearBtn) clearBtn.addEventListener("click", clearSelectedNickname);
-      if (resetBtn) resetBtn.addEventListener("click", clearSelectedNickname);
-
-      const closeNicknameSelectBtn = document.getElementById("closeNicknameSelectBtn");
-      const cancelNicknameSelectBtn = document.getElementById("cancelNicknameSelectBtn");
-      if (closeNicknameSelectBtn) closeNicknameSelectBtn.addEventListener("click", closeNicknameSelectModal);
-      if (cancelNicknameSelectBtn) cancelNicknameSelectBtn.addEventListener("click", closeNicknameSelectModal);
+      document.getElementById("clearSearchBtn")?.addEventListener("click", clearSelectedNickname);
+      document.getElementById("closeNicknameSelectBtn")?.addEventListener("click", closeNicknameSelectModal);
 
       const pwModal = document.getElementById("passwordModal");
       const pwContent = document.getElementById("passwordModalContent");
@@ -1087,28 +998,32 @@
       
       const togglePwModal = (show) => {
         if (!pwModal || !pwContent || !pwInput) return;
-        pwModal.classList.toggle("opacity-0", !show);
-        pwModal.classList.toggle("pointer-events-none", !show);
-        pwContent.classList.toggle("scale-95", !show);
-        if(show) { pwInput.value = ''; setTimeout(() => pwInput.focus(), 120); }
+        if (show) {
+          pwModal.classList.remove("hidden");
+          void pwModal.offsetWidth;
+          pwModal.classList.remove("opacity-0", "pointer-events-none");
+          pwContent.classList.remove("scale-95");
+          pwInput.value = '';
+          setTimeout(() => pwInput.focus(), 150);
+        } else {
+          pwModal.classList.add("opacity-0", "pointer-events-none");
+          pwContent.classList.add("scale-95");
+          setTimeout(() => pwModal.classList.add("hidden"), 200);
+        }
       };
 
-      const systemSyncBtn = document.getElementById("systemSyncBtn");
-      if (systemSyncBtn) {
-        systemSyncBtn.addEventListener("click", () => {
-          togglePwModal(true);
-        });
-      }
+      document.getElementById("systemSyncBtn")?.addEventListener("click", () => {
+        togglePwModal(true);
+      });
 
-      const cancelPwBtn = document.getElementById("cancelPasswordBtn");
-      if (cancelPwBtn) cancelPwBtn.addEventListener("click", () => togglePwModal(false));
+      document.getElementById("cancelPasswordBtn")?.addEventListener("click", () => togglePwModal(false));
       
       const checkPassword = () => {
         if (!pwInput) return;
         const entered = pwInput.value.trim();
         const validPassword = String(adminPassword).trim();
 
-        if(entered === validPassword || entered === "0718") {
+        if (entered === validPassword || entered === "0718") {
           togglePwModal(false);
           isUserDbUpdateRequested = true;
           loadGoogleSheetData(false);
@@ -1116,26 +1031,67 @@
           showToast("DB Update를 시작합니다.", "info");
         } else {
           pwInput.value = '';
-          if (typeof showAlert === "function") {
-            showAlert("입력하신 비밀번호가 올바르지 않습니다.<br><span class='text-xs text-slate-400 mt-1 block font-normal'>비밀번호를 다시 확인 후 입력해 주세요.</span>");
-          } else {
-            showToast("비밀번호가 일치하지 않습니다.", "error");
-          }
+          showAlert("입력하신 비밀번호가 올바르지 않습니다.<br><span class='text-xs text-slate-400 mt-1 block font-normal'>비밀번호를 다시 확인 후 입력해 주세요.</span>");
           pwInput.focus();
         }
       };
 
-      const verifyPwBtn = document.getElementById("verifyPasswordBtn");
-      if (verifyPwBtn) verifyPwBtn.addEventListener("click", checkPassword);
-      if (pwInput) pwInput.addEventListener("keydown", e => { if (e.key === "Enter") checkPassword(); });
+      document.getElementById("verifyPasswordBtn")?.addEventListener("click", checkPassword);
+      pwInput?.addEventListener("keydown", e => { if (e.key === "Enter") checkPassword(); });
 
-      // 모바일 등에서 스크롤 가능 영역 외를 위로 밀 때 화면 전체가 들썩이거나 헤더가 밀려 올라가는 현상 원천 차단
-      document.addEventListener("touchmove", (e) => {
-        const scrollable = e.target.closest("#ordersScrollWrapper, #modalNicknameList, #historyListContainer");
-        if (!scrollable) {
-          e.preventDefault();
+      // 사이드 드로어 조작
+      const sideMenuDrawerBackdrop = document.getElementById("sideMenuDrawerBackdrop");
+      const sideMenuDrawer = document.getElementById("sideMenuDrawer");
+
+      const openSideMenu = () => {
+        if (!sideMenuDrawerBackdrop || !sideMenuDrawer) return;
+        sideMenuDrawerBackdrop.classList.remove("hidden");
+        void sideMenuDrawerBackdrop.offsetWidth;
+        sideMenuDrawerBackdrop.classList.remove("opacity-0", "pointer-events-none");
+        sideMenuDrawer.classList.remove("translate-x-full");
+      };
+
+      const closeSideMenu = () => {
+        if (!sideMenuDrawerBackdrop || !sideMenuDrawer) return;
+        sideMenuDrawerBackdrop.classList.add("opacity-0", "pointer-events-none");
+        sideMenuDrawer.classList.add("translate-x-full");
+        setTimeout(() => sideMenuDrawerBackdrop.classList.add("hidden"), 300);
+      };
+
+      document.getElementById("hamburgerMenuBtn")?.addEventListener("click", openSideMenu);
+      document.getElementById("closeSideMenuBtn")?.addEventListener("click", closeSideMenu);
+      sideMenuDrawerBackdrop?.addEventListener("click", (e) => {
+        if (e.target === sideMenuDrawerBackdrop) closeSideMenu();
+      });
+
+      // 뷰(화면) 전환
+      const orderInquiryView = document.getElementById("orderInquiryView");
+      const storeLocationView = document.getElementById("storeLocationView");
+      const couponsView = document.getElementById("couponsView");
+      const systemSyncBtnWrapper = document.getElementById("systemSyncBtnWrapper");
+
+      function switchView(viewName) {
+        if (orderInquiryView) orderInquiryView.classList.add("hidden");
+        if (storeLocationView) storeLocationView.classList.add("hidden");
+        if (couponsView) couponsView.classList.add("hidden");
+
+        if (viewName === "order") {
+          if (orderInquiryView) orderInquiryView.classList.remove("hidden");
+          if (systemSyncBtnWrapper) systemSyncBtnWrapper.classList.remove("hidden");
+        } else if (viewName === "store") {
+          if (storeLocationView) storeLocationView.classList.remove("hidden");
+          if (systemSyncBtnWrapper) systemSyncBtnWrapper.classList.add("hidden");
+        } else if (viewName === "coupon") {
+          if (couponsView) couponsView.classList.remove("hidden");
+          if (systemSyncBtnWrapper) systemSyncBtnWrapper.classList.add("hidden");
         }
-      }, { passive: false });
+        closeSideMenu();
+        if (window.lucide) lucide.createIcons();
+      }
+
+      document.getElementById("navStoreLocationBtn")?.addEventListener("click", () => switchView("store"));
+      document.getElementById("navCouponsBtn")?.addEventListener("click", () => switchView("coupon"));
+      document.getElementById("backToOrderFromCouponBtn")?.addEventListener("click", () => switchView("order"));
 
       if (window.lucide) lucide.createIcons();
     });
