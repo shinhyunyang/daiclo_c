@@ -734,6 +734,28 @@
         return new Date(parts[0], parseInt(parts[1], 10) - 1, parts[2]).getTime() || 0;
       };
 
+      const isTodayDate = (dateStr) => {
+        if (!dateStr) return false;
+        const today = new Date();
+        const tY = today.getFullYear();
+        const tM = today.getMonth() + 1;
+        const tD = today.getDate();
+
+        const nums = String(dateStr).match(/\d+/g);
+        if (!nums || nums.length < 2) return false;
+        if (nums.length >= 3) {
+          let y = parseInt(nums[0], 10);
+          if (y < 100) y += 2000;
+          const m = parseInt(nums[1], 10);
+          const d = parseInt(nums[2], 10);
+          return y === tY && m === tM && d === tD;
+        } else {
+          const m = parseInt(nums[0], 10);
+          const d = parseInt(nums[1], 10);
+          return m === tM && d === tD;
+        }
+      };
+
       filtered.sort((a, b) => {
         const isCompleteA = a.status === "완료" || a.status === "1";
         const isCompleteB = b.status === "완료" || b.status === "1";
@@ -746,11 +768,14 @@
 
       filtered.forEach((order) => {
         const isComplete = order.status === "완료" || order.status === "1";
+        const isTodayPickup = !isComplete && isTodayDate(order.pickupDate);
         const itemCard = document.createElement("div");
         itemCard.className = `rounded-2xl transition-all px-4 py-3 sm:py-3.5 flex flex-col gap-2 ${
           isComplete 
             ? 'bg-emerald-950/20 backdrop-blur-xs border border-emerald-900/30 text-emerald-950/70 shadow-inner' 
-            : 'bg-white border border-emerald-200/90 shadow-xs hover:border-emerald-400 text-black'
+            : isTodayPickup
+              ? 'bg-white border-2 border-orange-400 shadow-md ring-2 ring-orange-200/70 text-black'
+              : 'bg-white border border-emerald-200/90 shadow-xs hover:border-emerald-400 text-black'
         }`;
 
         const unitPrice = order.unitPrice || (order.quantity > 0 ? Math.round(order.amount / order.quantity) : order.amount);
@@ -772,7 +797,7 @@
             <div class="flex items-center gap-2.5 sm:gap-3.5 flex-wrap">
               <span>주문일자: ${escapeHtml(order.orderDate || "-")}</span>
               <span class="${isComplete ? 'text-emerald-900/30' : 'text-slate-300'} font-normal select-none">|</span>
-              <span>픽업예정: ${escapeHtml(order.pickupDate || "-")}</span>
+              <span class="${isTodayPickup ? 'font-bold text-orange-600' : ''}">픽업예정: ${escapeHtml(order.pickupDate || "-")}${isTodayPickup ? ' (오늘)' : ''}</span>
             </div>
 
             <div class="shrink-0">
@@ -781,10 +806,17 @@
                      <i data-lucide="check" class="w-3 h-3 stroke-[2.5] text-emerald-900/70"></i>
                      <span>픽업 완료</span>
                    </span>` 
-                : `<span class="text-[11px] sm:text-xs font-bold px-2.5 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap inline-flex items-center gap-1">
-                     <i data-lucide="clock" class="w-3 h-3 text-amber-600"></i>
-                     <span>아직 픽업 전이예요</span>
-                   </span>`
+                : isTodayPickup
+                  ? `<span class="text-[11px] sm:text-xs font-black px-3 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-white border border-orange-500 shadow-md shadow-orange-500/30 whitespace-nowrap inline-flex items-center gap-1.5 tracking-tight">
+                       <span class="relative flex h-2 w-2">
+                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
+                         <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                       </span>
+                       <span>오늘 픽업</span>
+                     </span>`
+                  : `<span class="text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-[#278b4e] border border-[#34a862] shadow-2xs whitespace-nowrap inline-flex items-center">
+                       <span>픽업 전</span>
+                     </span>`
               }
             </div>
           </div>
