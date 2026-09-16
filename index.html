@@ -8,24 +8,40 @@
   <title>DAICLO 주문내역 조회 시스템 - 송파헬리오시티점</title>
   
   <script>
-    // 0. 카카오톡 인앱 브라우저 감지 시 즉시 외부 브라우저(사파리/크롬)로 자동 탈출
+    // 0. 전체화면 안전 호출 함수 정의 (스크립트 오류 원천 차단)
+    window.requestAppFullscreen = function() {
+      try {
+        var doc = window.document;
+        var docEl = doc.documentElement;
+        var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+        if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+          if (requestFullScreen) {
+            requestFullScreen.call(docEl).catch(function() {});
+          }
+        }
+      } catch (_) {}
+    };
+
+    // 1. 카카오톡 인앱 브라우저 감지 시 즉시 외부 브라우저(사파리/크롬)로 자동 탈출
     (function() {
       var ua = navigator.userAgent || navigator.vendor || window.opera || '';
       var isKakao = /KAKAOTALK/i.test(ua);
+      window.isKakaoTalk = isKakao;
       if (isKakao) {
+        document.documentElement.classList.add('kakaotalk-env');
         var currentUrl = window.location.href;
-        // 안드로이드: Chrome 패키지 인텐트 호출로 100% 카카오 툴바 원천 차단
+        // 안드로이드: Chrome 패키지 인텐트 호출
         if (/Android/i.test(ua)) {
           var cleanUrl = currentUrl.replace(/^https?:\/\//i, '');
           window.location.href = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end';
         } else {
-          // iOS(아이폰): 카카오 전용 외부 브라우저(사파리) 강제 호출 스킴 실행
+          // iOS(아이폰): 카카오 전용 외부 브라우저(사파리) 호출 스킴 실행
           window.location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(currentUrl);
         }
       }
     })();
 
-    // 외부 브라우저 수동 호출 함수 (비상용)
+    // 외부 브라우저 수동 호출 함수
     window.openExternalBrowser = function() {
       var ua = navigator.userAgent || '';
       var currentUrl = window.location.href;
@@ -36,7 +52,7 @@
       }
     };
 
-    // 1. Google Sheets gviz 에러 응답 시 ReferenceError 원천 차단을 위한 전역 스텁
+    // 2. Google Sheets gviz 에러 응답 시 ReferenceError 방지 스텁
     window.google = window.google || {};
     window.google.visualization = window.google.visualization || {};
     window.google.visualization.Query = window.google.visualization.Query || {};
@@ -48,7 +64,7 @@
       }
     };
 
-    // 2. 외부 CDN 및 크로스 오리진 비동기 스크립트 에러 억제 가드
+    // 3. 외부 CDN 및 크로스 오리진 비동기 스크립트 에러 억제 가드
     window.onerror = function(message, source, lineno, colno, error) {
       if (
         !message ||
@@ -61,19 +77,6 @@
       }
       return false;
     };
-
-    window.addEventListener('error', function(event) {
-      if (
-        event.message === 'Script error.' ||
-        event.message === 'Script error' ||
-        !event.filename ||
-        (event.filename && (event.filename.includes('google') || event.filename.includes('gstatic')))
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        return true;
-      }
-    }, true);
   </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
