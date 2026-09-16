@@ -8,19 +8,31 @@
   <title>DAICLO 주문내역 조회 시스템 - 송파헬리오시티점</title>
   
   <script>
-    // 0. 카카오톡 인앱 브라우저 감지 및 환경 설정
-    window.isKakaoTalk = /KAKAOTALK/i.test(navigator.userAgent || navigator.vendor || window.opera);
-    if (window.isKakaoTalk) {
-      document.documentElement.classList.add('kakaotalk-env');
-    }
+    // 0. 카카오톡 인앱 브라우저 감지 시 즉시 외부 브라우저(사파리/크롬)로 자동 탈출
+    (function() {
+      var ua = navigator.userAgent || navigator.vendor || window.opera || '';
+      var isKakao = /KAKAOTALK/i.test(ua);
+      if (isKakao) {
+        var currentUrl = window.location.href;
+        // 안드로이드: Chrome 패키지 인텐트 호출로 100% 카카오 툴바 원천 차단
+        if (/Android/i.test(ua)) {
+          var cleanUrl = currentUrl.replace(/^https?:\/\//i, '');
+          window.location.href = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end';
+        } else {
+          // iOS(아이폰): 카카오 전용 외부 브라우저(사파리) 강제 호출 스킴 실행
+          window.location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(currentUrl);
+        }
+      }
+    })();
 
-    // 카카오톡 외부 브라우저(사파리/크롬) 탈출 함수 (사용자 제스처 트리거)
+    // 외부 브라우저 수동 호출 함수 (비상용)
     window.openExternalBrowser = function() {
-      const currentUrl = window.location.href;
-      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        window.location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(currentUrl);
-      } else {
+      var ua = navigator.userAgent || '';
+      var currentUrl = window.location.href;
+      if (/Android/i.test(ua)) {
         window.location.href = 'intent://' + currentUrl.replace(/^https?:\/\//i, '') + '#Intent;scheme=https;package=com.android.chrome;end';
+      } else {
+        window.location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(currentUrl);
       }
     };
 
