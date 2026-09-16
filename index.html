@@ -793,16 +793,16 @@
             <span class="${isComplete ? 'text-emerald-950/90' : 'text-emerald-950'} font-extrabold whitespace-nowrap">${Number(order.amount).toLocaleString()}원</span>
           </div>
 
-          <div class="flex items-center justify-between flex-wrap gap-2 pt-1 border-t ${isComplete ? 'border-emerald-900/20 text-emerald-950/70' : 'border-emerald-100 text-emerald-900'} text-xs sm:text-sm font-medium">
-            <div class="flex items-center gap-2.5 sm:gap-3.5 flex-wrap">
-              <span>주문일자: ${escapeHtml(order.orderDate || "-")}</span>
+          <div class="flex items-center justify-between gap-2 pt-1 border-t ${isComplete ? 'border-emerald-900/20 text-emerald-950/70' : 'border-emerald-100 text-emerald-900'} text-xs sm:text-sm font-medium">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0 truncate">
+              <span class="whitespace-nowrap">주문일자: ${escapeHtml(order.orderDate || "-")}</span>
               <span class="${isComplete ? 'text-emerald-900/30' : 'text-slate-300'} font-normal select-none">|</span>
-              <span class="${isTodayPickup ? 'font-bold text-orange-600' : ''}">픽업예정: ${escapeHtml(order.pickupDate || "-")}${isTodayPickup ? ' (오늘)' : ''}</span>
+              <span class="whitespace-nowrap ${isTodayPickup ? 'font-bold text-orange-600' : ''}">픽업예정: ${escapeHtml(order.pickupDate || "-")}</span>
             </div>
 
-            <div class="shrink-0">
+            <div class="shrink-0 ml-auto">
               ${isComplete 
-                ? `<span class="text-[11px] sm:text-xs font-bold px-2.5 py-0.5 rounded-lg bg-emerald-950/15 text-emerald-950/85 border border-emerald-900/25 shadow-inner whitespace-nowrap inline-flex items-center gap-1">
+                ? `<span class="text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-950/15 text-emerald-950/85 border border-emerald-900/25 shadow-inner whitespace-nowrap inline-flex items-center gap-1">
                      <i data-lucide="check" class="w-3 h-3 stroke-[2.5] text-emerald-900/70"></i>
                      <span>픽업 완료</span>
                    </span>` 
