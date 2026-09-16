@@ -158,18 +158,18 @@
       width: 0px !important;
       height: 0px !important;
     }
-    /* 카카오톡 인앱 브라우저 접속 시 하단 시스템 툴바 가림 방지 */
+    /* 카카오톡 및 모바일 전체화면 안전 여백 최적화 */
     .kakaotalk-env #systemSyncBtnWrapper {
-      bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)) !important;
+      bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     .kakaotalk-env #orderInquiryView,
     .kakaotalk-env #storeLocationView,
     .kakaotalk-env #couponsView {
-      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
+      padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)) !important;
     }
   </style>
 </head>
-<body class="h-screen h-[100dvh] w-full bg-[#f7faf8] flex flex-col selection:bg-emerald-200 selection:text-emerald-900 overflow-hidden">
+<body onclick="window.requestAppFullscreen()" class="h-screen h-[100dvh] w-full bg-[#f7faf8] flex flex-col selection:bg-emerald-200 selection:text-emerald-900 overflow-hidden">
 
   <!-- 카카오톡 인앱 브라우저 전용 탈출 안내 배너 -->
   <div id="kakaoInAppNoticeBanner" class="hidden bg-emerald-900 text-white px-4 py-2 text-xs flex items-center justify-between shrink-0 select-none z-50 border-b border-emerald-800 shadow-sm">
