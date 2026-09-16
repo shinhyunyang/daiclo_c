@@ -202,7 +202,7 @@
             <span class="text-[9px] sm:text-[10px] ml-1 font-sans font-bold border border-emerald-300 rounded-full w-3.5 h-3.5 flex items-center justify-center text-emerald-100">R</span>
           </div>
         </button>
-        <span class="text-base sm:text-lg font-extrabold font-brand text-emerald-900 tracking-tight ml-1 sm:ml-1.5">송파헬리오시티점</span>
+        <span class="text-lg sm:text-xl font-extrabold font-brand text-emerald-900 tracking-tight ml-1 sm:ml-1.5">송파헬리오시티점</span>
       </div>
 
       <!-- 우측 버튼 그룹: 홈 버튼 + 햄버거 메뉴 버튼 -->
@@ -381,8 +381,8 @@
             />
           </div>
 
-          <!-- 플로팅 줌 컨트롤러 (+ / - / 초기화) -->
-          <div class="absolute right-3.5 bottom-3.5 z-20 flex flex-col gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl shadow-lg border border-emerald-100 select-none">
+          <!-- 플로팅 줌 컨트롤러 (+ / - / 초기화): 오른쪽 상단 배치 -->
+          <div class="absolute right-3.5 top-3.5 z-20 flex flex-col gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl shadow-lg border border-emerald-100 select-none">
             <button id="mapZoomInBtn" type="button" aria-label="지도 확대" title="확대"
               class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-800 transition-all cursor-pointer touch-manipulation">
               <i data-lucide="plus" class="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]"></i>
@@ -1026,14 +1026,13 @@
         const renderedW = iW * ratio;
         const renderedH = iH * ratio;
 
-        // 뷰포트에 꽉 차도록 배율 계산 (세로/가로 긴 모바일 화면에서 빈 여백 없이 꽉 채움)
+        // 뷰포트에 꽉 차도록 확대 배율을 시원하게 상향 계산 (최소 1.6배 ~ 최대 2.8배)
         let targetScale = 1;
         if (renderedW > 0 && renderedH > 0) {
-          const fillScale = Math.max(vW / renderedW, vH / renderedH);
-          // 너무 과도하지 않으면서 화면에 꽉 차도록 1.25~2.2 사이 최적 비율 산출
-          targetScale = Math.min(2.5, Math.max(1.25, fillScale));
+          const fillScale = Math.max(vW / renderedW, vH / renderedH) * 1.15;
+          targetScale = Math.min(2.8, Math.max(1.6, fillScale));
         } else {
-          targetScale = 1.4;
+          targetScale = 1.8;
         }
 
         currentScale = targetScale;
