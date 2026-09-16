@@ -995,8 +995,8 @@
       let currentScale = 1;
       let currentTranslateX = 0;
       let currentTranslateY = 0;
-      const MIN_SCALE = 1;
-      const MAX_SCALE = 4.5;
+      const MIN_SCALE = 0.9;
+      const MAX_SCALE = 5.0;
 
       function updateMapTransform(animate = true) {
         if (!transformWrapper || !mapViewport) return;
@@ -1006,26 +1006,52 @@
           transformWrapper.style.transition = "none";
         }
 
-        if (currentScale <= 1) {
-          currentScale = 1;
-          currentTranslateX = 0;
-          currentTranslateY = 0;
-        } else {
-          const boundsX = (mapViewport.clientWidth * (currentScale - 1)) / 2 + 100;
-          const boundsY = (mapViewport.clientHeight * (currentScale - 1)) / 2 + 100;
-          currentTranslateX = Math.max(-boundsX, Math.min(boundsX, currentTranslateX));
-          currentTranslateY = Math.max(-boundsY, Math.min(boundsY, currentTranslateY));
-        }
+        const boundsX = Math.max(0, (mapViewport.clientWidth * (currentScale - 1)) / 2 + 60);
+        const boundsY = Math.max(0, (mapViewport.clientHeight * (currentScale - 1)) / 2 + 60);
+        currentTranslateX = Math.max(-boundsX, Math.min(boundsX, currentTranslateX));
+        currentTranslateY = Math.max(-boundsY, Math.min(boundsY, currentTranslateY));
 
         transformWrapper.style.transform = `translate3d(${currentTranslateX}px, ${currentTranslateY}px, 0px) scale(${currentScale})`;
       }
 
-      function resetMapZoom() {
-        currentScale = 1;
+      function fitMapToScreen(animate = false) {
+        if (!mapViewport || !storeMapDriveImage) return;
+        const vW = mapViewport.clientWidth || 320;
+        const vH = mapViewport.clientHeight || 300;
+        const iW = storeMapDriveImage.naturalWidth || 800;
+        const iH = storeMapDriveImage.naturalHeight || 600;
+
+        // 이미지의 기본 contain 렌더링 크기 계산
+        const ratio = Math.min(vW / iW, vH / iH);
+        const renderedW = iW * ratio;
+        const renderedH = iH * ratio;
+
+        // 뷰포트에 꽉 차도록 배율 계산 (세로/가로 긴 모바일 화면에서 빈 여백 없이 꽉 채움)
+        let targetScale = 1;
+        if (renderedW > 0 && renderedH > 0) {
+          const fillScale = Math.max(vW / renderedW, vH / renderedH);
+          // 너무 과도하지 않으면서 화면에 꽉 차도록 1.25~2.2 사이 최적 비율 산출
+          targetScale = Math.min(2.5, Math.max(1.25, fillScale));
+        } else {
+          targetScale = 1.4;
+        }
+
+        currentScale = targetScale;
         currentTranslateX = 0;
         currentTranslateY = 0;
-        updateMapTransform(true);
+        updateMapTransform(animate);
       }
+
+      function resetMapZoom() {
+        fitMapToScreen(true);
+      }
+
+      // 이미지 로딩 완료 시 자동으로 화면 맞춤 크기 적용
+      storeMapDriveImage?.addEventListener("load", () => {
+        if (!storeLocationView.classList.contains("hidden")) {
+          fitMapToScreen(false);
+        }
+      });
 
       zoomInBtn?.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1276,7 +1302,10 @@
         } else if (viewName === "store") {
           if (storeLocationView) storeLocationView.classList.remove("hidden");
           if (systemSyncBtnWrapper) systemSyncBtnWrapper.classList.add("hidden");
-          resetMapZoom();
+          // 뷰포트 레이아웃 렌더링 후 화면에 꽉 차게 자동 확대
+          setTimeout(() => {
+            fitMapToScreen(false);
+          }, 30);
         } else if (viewName === "coupon") {
           if (couponsView) couponsView.classList.remove("hidden");
           if (systemSyncBtnWrapper) systemSyncBtnWrapper.classList.add("hidden");
