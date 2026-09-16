@@ -801,18 +801,6 @@
               <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
               <span class="${isComplete ? 'text-emerald-950/90' : 'text-emerald-950'} font-extrabold whitespace-nowrap">${Number(order.amount).toLocaleString()}원</span>
             </div>
-
-            ${isTodayPickup ? `
-              <div class="shrink-0 ml-auto pl-2">
-                <span class="text-[11px] sm:text-xs font-black px-3 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-white border border-orange-500 shadow-md shadow-orange-500/30 whitespace-nowrap inline-flex items-center gap-1.5 tracking-tight select-none">
-                  <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                  </span>
-                  <span>오늘 픽업</span>
-                </span>
-              </div>
-            ` : ''}
           </div>
 
           <div class="flex items-center justify-between gap-2 pt-1 border-t ${isComplete ? 'border-emerald-900/20 text-emerald-950/70' : 'border-emerald-100 text-emerald-900'} text-xs sm:text-sm font-medium">
@@ -828,15 +816,21 @@
                      <i data-lucide="check" class="w-3 h-3 stroke-[2.5] text-emerald-900/70"></i>
                      <span>픽업 완료</span>
                    </span>` 
-                : isPastPickup
-                  ? `<span class="text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg bg-red-600 text-white border border-red-600 shadow-2xs whitespace-nowrap inline-flex items-center">
-                       <span>미픽업</span>
+                : isTodayPickup
+                  ? `<span class="text-[11px] sm:text-xs font-black px-3 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-white border border-orange-500 shadow-md shadow-orange-500/30 whitespace-nowrap inline-flex items-center gap-1.5 tracking-tight select-none">
+                       <span class="relative flex h-2 w-2">
+                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
+                         <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                       </span>
+                       <span>오늘 픽업</span>
                      </span>`
-                  : !isTodayPickup
-                    ? `<span class="text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-[#278b4e] border border-[#34a862] shadow-2xs whitespace-nowrap inline-flex items-center">
+                  : isPastPickup
+                    ? `<span class="text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg bg-red-600 text-white border border-red-600 shadow-2xs whitespace-nowrap inline-flex items-center">
+                         <span>미픽업</span>
+                       </span>`
+                    : `<span class="text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-[#278b4e] border border-[#34a862] shadow-2xs whitespace-nowrap inline-flex items-center">
                          <span>픽업 전</span>
                        </span>`
-                    : ''
               }
             </div>
           </div>
