@@ -806,18 +806,20 @@
         const unitPrice = order.unitPrice || (order.quantity > 0 ? Math.round(order.amount / order.quantity) : order.amount);
 
         itemCard.innerHTML = `
-          <div class="flex items-center justify-between gap-2 w-full">
-            <div class="min-w-0 flex items-center flex-wrap gap-1.5 sm:gap-2.5 text-sm sm:text-base md:text-lg font-bold ${isComplete ? 'text-emerald-950/80' : 'text-black'}">
-              <span class="truncate max-w-[200px] sm:max-w-md md:max-w-lg font-bold ${isComplete ? 'text-emerald-950/85' : 'text-black'}" title="${escapeHtml(order.productName || '상품명 없음')}">
-                ${escapeHtml(order.productName || "상품명 없음")}
-              </span>
-              <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
-              <span class="whitespace-nowrap">${Number(unitPrice).toLocaleString()}원</span>
-              <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
-              <span class="whitespace-nowrap">${order.quantity}개</span>
-              <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
-              <span class="${isComplete ? 'text-emerald-950/90' : 'text-emerald-950'} font-extrabold whitespace-nowrap">${Number(order.amount).toLocaleString()}원</span>
+          <!-- 1. 품목명 라인 (독립적인 첫 번째 줄) -->
+          <div class="w-full">
+            <div class="text-sm sm:text-base md:text-lg font-extrabold tracking-tight truncate ${isComplete ? 'text-emerald-950/85' : 'text-black'}" title="${escapeHtml(order.productName || '상품명 없음')}">
+              ${escapeHtml(order.productName || "상품명 없음")}
             </div>
+          </div>
+
+          <!-- 2. 단가 / 수량 / 결제금액 라인 (줄바꿈된 상세 정보) -->
+          <div class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm md:text-base font-bold ${isComplete ? 'text-emerald-950/80' : 'text-black'}">
+            <span class="whitespace-nowrap">${Number(unitPrice).toLocaleString()}원</span>
+            <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
+            <span class="whitespace-nowrap">${order.quantity}개</span>
+            <span class="${isComplete ? 'text-emerald-900/40' : 'text-slate-300'} font-normal select-none">/</span>
+            <span class="${isComplete ? 'text-emerald-950/90' : 'text-emerald-950'} font-extrabold whitespace-nowrap">${Number(order.amount).toLocaleString()}원</span>
           </div>
 
           <div class="flex items-center justify-between gap-2 pt-1 border-t ${isComplete ? 'border-emerald-900/20 text-emerald-950/70' : 'border-emerald-100 text-emerald-900'} text-xs sm:text-sm font-medium">
