@@ -87,11 +87,6 @@
       overflow-x: hidden; 
     }
     html, body {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
       width: 100%;
       height: 100%;
       height: 100dvh;
@@ -287,7 +282,7 @@
   <!-- [메인 화면 영역 2] 매장 위치 및 주차안내 화면 (이미지 전용 뷰어) -->
   <main id="storeLocationView" class="hidden max-w-6xl mx-auto px-2 sm:px-4 pt-2 sm:pt-3 pb-4 sm:pb-6 flex-1 w-full flex flex-col min-h-0 overflow-hidden">
     <div class="bg-white rounded-2xl sm:rounded-3xl border border-emerald-100 shadow-xl flex-1 min-h-0 flex flex-col overflow-hidden relative">
-      <!-- 상단 간결 헤더 바 -->
+      <!-- 상단 헤더 바 -->
       <div class="px-3 sm:px-5 py-2.5 sm:py-3 border-b border-emerald-100/80 flex items-center justify-between bg-white shrink-0">
         <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
           <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/60 shadow-2xs shrink-0">
@@ -318,14 +313,14 @@
         <div id="mapZoomViewport" class="w-full h-full bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs relative overflow-hidden flex items-center justify-center select-none touch-none cursor-grab active:cursor-grabbing">
           <!-- 변형(줌/팬)이 적용되는 래퍼 레이어 -->
           <div id="mapTransformWrapper" class="w-full h-full flex items-center justify-center origin-center transition-transform duration-75 ease-out pointer-events-none">
-            <!-- 실제 렌더링되는 안내 이미지 (구글 드라이브 및 로컬 이미지 폴백 지원) -->
+            <!-- 실제 렌더링되는 안내 이미지 (구글 드라이브 및 로컬 이미지 다단계 폴백 지원) -->
             <img 
               id="storeMapDriveImage" 
               src="https://lh3.googleusercontent.com/d/15oiQfJM0KRyzf0lUULhXVi8MDvQfULf-"
               alt="다이클로 송파헬리오시티점 위치정보 및 주차안내 daiclo_map" 
               class="max-w-full max-h-full w-auto h-auto object-contain select-none rounded-xl pointer-events-auto"
               draggable="false"
-              onerror="if(this.dataset.fallback !== '1'){ this.dataset.fallback='1'; this.src='daiclo_map.png'; } else if(this.dataset.fallback === '1'){ this.dataset.fallback='2'; this.src='image_ad2d0c.png'; }"
+              onerror="window.handleMapImgError(this)"
             />
           </div>
 
@@ -460,6 +455,7 @@
     let activeSelectedNickname = "";
     let multiNicknameChoices = [];
     let adminPassword = "0718";
+    let isUserDbUpdateRequested = false;
 
     const SHEET_ID = "11OG6u2i64D6exMiBgqGbkq-wrmxrYrVfLSzbYsBoXC8";
     const DEFAULT_MAP_IMAGE = "https://lh3.googleusercontent.com/d/15oiQfJM0KRyzf0lUULhXVi8MDvQfULf-";
@@ -471,65 +467,27 @@
       { id: 'ORD-5', sheetRowIndex: 5, orderDate: '2026.09.10', pickupDate: '2026.09.12', nickname: '1234', productName: '데일리 오가닉 코튼 티셔츠 3팩', quantity: 1, amount: 29900, status: '픽업예정' }
     ];
 
-    // IndexedDB 대용량 영구 저장소 함수
-    const DB_NAME = "DaicloStoreDB";
-    const STORE_NAME = "store_assets";
-    const MAP_KEY = "daiclo_store_map_image";
-
-    function getMapDB() {
-      return new Promise((resolve, reject) => {
-        if (!window.indexedDB) {
-          reject(new Error("IndexedDB not supported"));
-          return;
-        }
-        const request = indexedDB.open(DB_NAME, 1);
-        request.onupgradeneeded = (e) => {
-          const db = e.target.result;
-          if (!db.objectStoreNames.contains(STORE_NAME)) {
-            db.createObjectStore(STORE_NAME);
-          }
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    async function savePersistentMapImage(dataUrl) {
-      try {
-        const db = await getMapDB();
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        tx.objectStore(STORE_NAME).put(dataUrl, MAP_KEY);
-        await new Promise((res, rej) => {
-          tx.oncomplete = res;
-          tx.onerror = rej;
-        });
-      } catch (e) {
-        console.warn("IndexedDB save error, fallbacking to localStorage:", e);
+    // 지도 이미지 다단계 폴백 핸들러
+    window.handleMapImgError = function(img) {
+      if (!img) return;
+      if (!img.dataset.step) {
+        img.dataset.step = "1";
+        img.src = "daiclo_map.png";
+      } else if (img.dataset.step === "1") {
+        img.dataset.step = "2";
+        img.src = "image_ad2d0c.png";
+      } else if (img.dataset.step === "2") {
+        img.dataset.step = "3";
+        img.src = "image_ad2930.png";
+      } else if (img.dataset.step === "3") {
+        img.dataset.step = "4";
+        img.src = "image_acb834.png";
+      } else {
+        img.classList.add("hidden");
+        const prompt = document.getElementById("driveImageEmptyPrompt");
+        if (prompt) prompt.classList.remove("hidden");
       }
-      try {
-        localStorage.setItem("daiclo_custom_store_map", dataUrl);
-      } catch (_) {}
-    }
-
-    async function loadPersistentMapImage() {
-      try {
-        const db = await getMapDB();
-        const tx = db.transaction(STORE_NAME, "readonly");
-        const req = tx.objectStore(STORE_NAME).get(MAP_KEY);
-        const result = await new Promise((res) => {
-          req.onsuccess = () => res(req.result);
-          req.onerror = () => res(null);
-        });
-        if (result) return result;
-      } catch (e) {
-        console.warn("IndexedDB load error, checking localStorage:", e);
-      }
-      try {
-        return localStorage.getItem("daiclo_custom_store_map");
-      } catch (_) {
-        return null;
-      }
-    }
+    };
 
     async function fetchSheetGvizData(sheetName) {
       try {
@@ -871,8 +829,6 @@
       } catch (err) {}
     }
 
-    let isUserDbUpdateRequested = false;
-
     async function loadGoogleSheetData(isSilent = false) {
       if (!isSilent) showToast("데이터 갱신 중...", "info");
 
@@ -900,6 +856,10 @@
           delete window[callbackName];
           if (window._currentGvizCallback === callbackName) window._currentGvizCallback = null;
           if (script.parentNode) script.parentNode.removeChild(script);
+          if (isUserDbUpdateRequested) {
+            isUserDbUpdateRequested = false;
+            showToast("데이터 갱신에 실패했습니다. 잠시 후 다시 시도해주세요.", "error");
+          }
           if (ordersData.length === 0) {
             ordersData = [...SAMPLE_INITIAL_ORDERS];
             render();
@@ -912,6 +872,10 @@
         if (timeoutHandler) clearTimeout(timeoutHandler);
         if (window[callbackName]) delete window[callbackName];
         if (script.parentNode) script.parentNode.removeChild(script);
+        if (isUserDbUpdateRequested) {
+          isUserDbUpdateRequested = false;
+          showToast("구글 시트 연결에 실패했습니다.", "error");
+        }
       };
       document.body.appendChild(script);
     }
@@ -944,7 +908,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       ordersData = [...SAMPLE_INITIAL_ORDERS];
       loadSettingsSheetData();
-      loadGoogleSheetData(false);
+      loadGoogleSheetData(true);
 
       const storeMapDriveImage = document.getElementById("storeMapDriveImage");
       const driveImageEmptyPrompt = document.getElementById("driveImageEmptyPrompt");
@@ -978,20 +942,18 @@
       const MAX_SCALE = 4.5;
 
       function updateMapTransform(animate = true) {
-        if (!transformWrapper) return;
+        if (!transformWrapper || !mapViewport) return;
         if (animate) {
           transformWrapper.style.transition = "transform 0.15s ease-out";
         } else {
           transformWrapper.style.transition = "none";
         }
 
-        // 축소 상태일 경우 중앙 위치 자동 보정
         if (currentScale <= 1) {
           currentScale = 1;
           currentTranslateX = 0;
           currentTranslateY = 0;
         } else {
-          // 뷰포트 영역 밖으로 과도하게 나가지 않도록 한계값 제한
           const boundsX = (mapViewport.clientWidth * (currentScale - 1)) / 2 + 100;
           const boundsY = (mapViewport.clientHeight * (currentScale - 1)) / 2 + 100;
           currentTranslateX = Math.max(-boundsX, Math.min(boundsX, currentTranslateX));
@@ -1008,7 +970,6 @@
         updateMapTransform(true);
       }
 
-      // 줌 버튼 클릭 이벤트
       zoomInBtn?.addEventListener("click", (e) => {
         e.stopPropagation();
         currentScale = Math.min(MAX_SCALE, currentScale + 0.5);
@@ -1026,7 +987,6 @@
         resetMapZoom();
       });
 
-      // 마우스 휠로 줌 인 / 줌 아웃
       mapViewport?.addEventListener("wheel", (e) => {
         e.preventDefault();
         const delta = e.deltaY < 0 ? 0.25 : -0.25;
@@ -1037,7 +997,6 @@
         }
       }, { passive: false });
 
-      // 더블클릭 / 더블탭 시 2배 확대 및 복귀 토글
       let lastTapTime = 0;
       mapViewport?.addEventListener("click", (e) => {
         if (e.target.closest("button")) return;
@@ -1053,7 +1012,6 @@
         lastTapTime = now;
       });
 
-      // 터치 / 마우스 드래그(Pan) & 핀치 줌(Pinch-to-zoom) 제스처 처리
       let isDragging = false;
       let startX = 0;
       let startY = 0;
@@ -1066,7 +1024,6 @@
         return Math.hypot(dx, dy);
       }
 
-      // Pointer & Touch Events
       mapViewport?.addEventListener("touchstart", (e) => {
         if (e.touches.length === 1) {
           isDragging = true;
@@ -1100,9 +1057,9 @@
         updateMapTransform(true);
       }, { passive: true });
 
-      // PC 마우스 드래그
       mapViewport?.addEventListener("mousedown", (e) => {
         if (e.button !== 0 || e.target.closest("button")) return;
+        e.preventDefault();
         isDragging = true;
         startX = e.clientX - currentTranslateX;
         startY = e.clientY - currentTranslateY;
@@ -1122,13 +1079,33 @@
         }
       });
 
+      const customAlertModal = document.getElementById("customAlertModal");
+      const customAlertContent = document.getElementById("customAlertContent");
+      const customAlertMessage = document.getElementById("customAlertMessage");
+
+      function showAlert(message) {
+        if (!customAlertModal || !customAlertContent || !customAlertMessage) return;
+        customAlertMessage.innerHTML = message;
+        customAlertModal.classList.remove("hidden");
+        void customAlertModal.offsetWidth;
+        customAlertModal.classList.remove("opacity-0", "pointer-events-none");
+        customAlertContent.classList.remove("scale-95");
+        if (window.lucide) lucide.createIcons();
+      }
+      window.showAlert = showAlert;
+
+      document.getElementById("closeAlertBtn")?.addEventListener("click", () => {
+        customAlertModal.classList.add("opacity-0", "pointer-events-none");
+        customAlertContent.classList.add("scale-95");
+        setTimeout(() => customAlertModal.classList.add("hidden"), 200);
+      });
+
       function resetToHomeScreen(isManual = false) {
         switchView("order");
         closeSideMenu();
         clearSelectedNickname();
         togglePwModal(false);
         resetMapZoom();
-        const customAlertModal = document.getElementById("customAlertModal");
         if (customAlertModal) {
           customAlertModal.classList.add("opacity-0", "pointer-events-none");
           setTimeout(() => customAlertModal.classList.add("hidden"), 200);
@@ -1141,26 +1118,6 @@
       document.getElementById("manualHomeRefreshBtn")?.addEventListener("click", () => resetToHomeScreen(true));
       document.getElementById("headerLogoBtn")?.addEventListener("click", (e) => { e.stopPropagation(); resetToHomeScreen(true); });
       document.getElementById("headerHomeClickArea")?.addEventListener("click", () => resetToHomeScreen(true));
-
-      const customAlertModal = document.getElementById("customAlertModal");
-      const customAlertContent = document.getElementById("customAlertContent");
-      const customAlertMessage = document.getElementById("customAlertMessage");
-
-      window.showAlert = function(message) {
-        if (!customAlertModal || !customAlertContent || !customAlertMessage) return;
-        customAlertMessage.innerHTML = message;
-        customAlertModal.classList.remove("hidden");
-        void customAlertModal.offsetWidth;
-        customAlertModal.classList.remove("opacity-0", "pointer-events-none");
-        customAlertContent.classList.remove("scale-95");
-        if (window.lucide) lucide.createIcons();
-      };
-
-      document.getElementById("closeAlertBtn")?.addEventListener("click", () => {
-        customAlertModal.classList.add("opacity-0", "pointer-events-none");
-        customAlertContent.classList.add("scale-95");
-        setTimeout(() => customAlertModal.classList.add("hidden"), 200);
-      });
 
       document.getElementById("searchNicknameBtn")?.addEventListener("click", executeNicknameSearch);
       const searchInput = document.getElementById("nicknameSearchInput");
