@@ -409,17 +409,10 @@
 
   <!-- [팝업 모달 2] 보유 쿠폰 팝업 -->
   <div id="couponsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
-    <div id="couponsModalContent" class="bg-white rounded-3xl shadow-2xl w-full max-w-sm flex flex-col transform scale-95 transition-transform duration-200 overflow-hidden border border-emerald-100 p-6 sm:p-7 text-center">
-      <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-amber-100 shadow-sm">
-        <i data-lucide="ticket" class="w-8 h-8 stroke-[2]"></i>
+    <div id="couponsModalContent" class="bg-white rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm flex flex-col transform scale-95 transition-transform duration-200 overflow-hidden border border-emerald-100 p-6 sm:p-7 text-center">
+      <div class="py-5 sm:py-6 flex items-center justify-center">
+        <p class="text-lg sm:text-xl font-bold text-slate-700 tracking-tight">서비스 준비중</p>
       </div>
-      <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold mb-2 mx-auto">
-        <span>서비스 준비 중</span>
-      </div>
-      <h2 class="text-xl font-extrabold text-slate-800 mb-1">보유 쿠폰 서비스</h2>
-      <p class="text-xs sm:text-sm text-slate-500 leading-relaxed mb-6 font-medium">
-        고객님을 위한 쿠폰 및 멤버십 혜택 기능을 준비 중입니다.<br>빠른 시일 내에 찾아뵙겠습니다.
-      </p>
       <button id="closeCouponsModalBtn" type="button" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-sm font-bold shadow-md transition-all cursor-pointer touch-manipulation">
         확인
       </button>
