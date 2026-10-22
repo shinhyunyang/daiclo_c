@@ -137,7 +137,7 @@
             <span class="text-base sm:text-xl font-bold text-emerald-100 drop-shadow-xs">(카톡주문 포함)</span>
           </h1>
           <p class="text-xs sm:text-sm text-emerald-50 leading-relaxed mt-1">
-            주문하신 닉네임으로 주문내역을 조회하세요.
+            주문하신 닉네임으로 주문내역을 조회하세요
           </p>
         </div>
 
@@ -355,7 +355,7 @@
           <div><span class="font-bold text-slate-900">주차 위치 :</span> 헬리오시티상가 2-A 주차장 이용 (무료)</div>
         </div>
         <div id="mapImageContainer" class="relative rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[200px] cursor-pointer group active:scale-[0.98] transition-all">
-          <img src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105">
+          <img src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover transform scale-125 transition-transform duration-500 group-hover:scale-[1.35]">
           <div class="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors flex items-center justify-center">
             <div class="bg-white/90 backdrop-blur-sm px-3 py-2 rounded-full shadow-md text-emerald-700 font-bold text-xs flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
               <i data-lucide="zoom-in" class="w-4 h-4"></i>
@@ -364,6 +364,20 @@
           </div>
         </div>
       </div>
+    </div>
+
+  <!-- 이미지 확대 뷰어 모달 -->
+  <div id="imageViewerModal" class="hidden fixed inset-0 z-[70] bg-black/95 backdrop-blur-sm opacity-0 transition-opacity duration-300 flex flex-col touch-none">
+    <div class="flex justify-end p-4 shrink-0">
+      <button id="closeImageViewerBtn" type="button" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer z-10">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-hidden flex items-center justify-center p-4 relative" id="imageViewerContainer">
+      <img id="viewerImage" src="" alt="확대된 지도" class="max-w-none origin-center transition-transform duration-100" style="width: 100%; max-width: 800px; object-fit: contain;">
+    </div>
+    <div class="p-5 text-center text-white/60 text-xs sm:text-sm shrink-0 font-medium tracking-tight">
+      두 손가락으로 확대/축소하거나 두 번 연속 터치하세요
     </div>
   </div>
 
@@ -1415,23 +1429,49 @@
         loadGoogleSheetData(false);
       });
 
-      // 지도 이미지 확대 뷰어 로직
+      // 지도 이미지 확대 뷰어 로직 (터치 핀치 줌 및 드래그, 더블탭 지원)
       const mapImageContainer = document.getElementById("mapImageContainer");
       const imageViewerModal = document.getElementById("imageViewerModal");
       const viewerImage = document.getElementById("viewerImage");
       const closeImageViewerBtn = document.getElementById("closeImageViewerBtn");
-      let isZoomed = false;
+      const imageViewerContainer = document.getElementById("imageViewerContainer");
 
-      if (mapImageContainer && imageViewerModal && viewerImage) {
+      if (mapImageContainer && imageViewerModal && viewerImage && imageViewerContainer) {
+        let currentScale = 1;
+        let currentX = 0;
+        let currentY = 0;
+        let startX = 0;
+        let startY = 0;
+        let initialDistance = 0;
+        let isDragging = false;
+        let isPinching = false;
+        let lastTap = 0;
+
+        const updateTransform = (animate = false) => {
+          if (currentScale < 1) currentScale = 1;
+          if (currentScale > 5) currentScale = 5;
+          
+          if (currentScale === 1) {
+            currentX = 0;
+            currentY = 0;
+          }
+
+          viewerImage.style.transition = animate ? 'transform 0.3s ease-out' : 'none';
+          viewerImage.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+        };
+
+        const resetZoom = () => {
+          currentScale = 1;
+          currentX = 0;
+          currentY = 0;
+          updateTransform(true);
+        };
+
         mapImageContainer.addEventListener("click", () => {
           const imgEl = mapImageContainer.querySelector("img");
           if (imgEl) {
             viewerImage.src = imgEl.src;
-            viewerImage.style.transform = 'scale(1)';
-            isZoomed = false;
-            viewerImage.classList.remove("cursor-zoom-out");
-            viewerImage.classList.add("cursor-zoom-in");
-            
+            resetZoom();
             imageViewerModal.classList.remove("hidden");
             void imageViewerModal.offsetWidth;
             imageViewerModal.classList.remove("opacity-0");
@@ -1444,23 +1484,64 @@
         };
 
         closeImageViewerBtn?.addEventListener("click", closeViewer);
-        document.getElementById("imageViewerContainer")?.addEventListener("click", (e) => {
-          // 이미지 밖의 영역(컨테이너 배경)을 클릭했을 때만 닫히도록 처리
-          if (e.target === e.currentTarget) closeViewer();
+
+        const getDistance = (touches) => {
+          return Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
+        };
+
+        imageViewerContainer.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 2) {
+            isPinching = true;
+            isDragging = false;
+            initialDistance = getDistance(e.touches);
+          } else if (e.touches.length === 1) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            // 더블 탭 확인
+            if (tapLength < 300 && tapLength > 0) {
+              e.preventDefault();
+              currentScale = currentScale > 1 ? 1 : 2.5;
+              currentX = 0;
+              currentY = 0;
+              updateTransform(true);
+            } else if (currentScale > 1) {
+              isDragging = true;
+              startX = e.touches[0].pageX - currentX;
+              startY = e.touches[0].pageY - currentY;
+            }
+            lastTap = currentTime;
+          }
+        }, { passive: false });
+
+        imageViewerContainer.addEventListener('touchmove', (e) => {
+          if (isPinching && e.touches.length === 2) {
+            e.preventDefault();
+            const currentDistance = getDistance(e.touches);
+            const scaleDiff = (currentDistance - initialDistance) * 0.015;
+            currentScale += scaleDiff;
+            initialDistance = currentDistance;
+            updateTransform(false);
+          } else if (isDragging && e.touches.length === 1) {
+            e.preventDefault();
+            currentX = e.touches[0].pageX - startX;
+            currentY = e.touches[0].pageY - startY;
+            updateTransform(false);
+          }
+        }, { passive: false });
+
+        imageViewerContainer.addEventListener('touchend', (e) => {
+          if (e.touches.length < 2) isPinching = false;
+          if (e.touches.length === 0) isDragging = false;
         });
 
-        viewerImage.addEventListener("click", (e) => {
-          e.stopPropagation();
-          isZoomed = !isZoomed;
-          if (isZoomed) {
-            viewerImage.style.transform = 'scale(1.8)';
-            viewerImage.classList.remove("cursor-zoom-in");
-            viewerImage.classList.add("cursor-zoom-out");
-          } else {
-            viewerImage.style.transform = 'scale(1)';
-            viewerImage.classList.remove("cursor-zoom-out");
-            viewerImage.classList.add("cursor-zoom-in");
-          }
+        // 마우스 더블클릭 이벤트 (PC 환경 대비)
+        viewerImage.addEventListener('dblclick', (e) => {
+          e.preventDefault();
+          currentScale = currentScale > 1 ? 1 : 2.5;
+          currentX = 0;
+          currentY = 0;
+          updateTransform(true);
         });
       }
 
