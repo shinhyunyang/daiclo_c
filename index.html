@@ -137,7 +137,7 @@
             <span class="text-base sm:text-xl font-bold text-emerald-100 drop-shadow-xs">(카톡주문 포함)</span>
           </h1>
           <p class="text-xs sm:text-sm text-emerald-50 leading-relaxed mt-1">
-            주문하신 닉네임으로 주문내역을 조회하세요
+            주문하신 닉네임으로 주문내역을 조회하세요.
           </p>
         </div>
 
@@ -161,7 +161,7 @@
 
         <!-- 보유 포인트 표시 영역 (적립/사용 이력 버튼 및 사용안내 버튼) -->
         <div id="userPointInfoContainer" class="hidden mt-2 pt-1.5 flex items-center justify-between px-4 py-2.5 bg-white/20 rounded-xl text-white font-extrabold text-base sm:text-lg select-none backdrop-blur-xs">
-          <span id="userPointDisplayLabel">보유 포인트 : 0P</span>
+          <span id="userPointDisplayLabel">포인트: 0P</span>
           <div class="flex items-center gap-1.5 shrink-0">
             <!-- 적립/사용 이력 버튼 -->
             <button id="openPointHistoryModalBtn" type="button" class="shrink-0 px-3 py-1.5 bg-white/90 hover:bg-white text-[#278b4e] active:scale-95 text-xs sm:text-sm font-extrabold rounded-lg shadow-sm transition-all cursor-pointer">
@@ -355,12 +355,12 @@
           <div><span class="font-bold text-slate-900">주차 위치 :</span> 헬리오시티상가 2-A 주차장 이용 (무료)</div>
         </div>
         <div class="rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[200px]">
-          <img src="image_322464.png" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover">
+          <!-- Added an onerror fallback image just in case the original map image doesn't exist in the same directory -->
+          <img src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover">
         </div>
       </div>
     </div>
-
-    <!-- 포인트 사용 안내 모달 -->
+  </div>
 
   <!-- 포인트 사용 안내 모달 -->
   <div id="couponsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
@@ -874,7 +874,7 @@
       const pointValue = memberPointsMap[exactNickKey] !== undefined ? memberPointsMap[exactNickKey] : 0;
       
       if (pointContainer && pointDisplayLabel) {
-        pointDisplayLabel.textContent = `보유 포인트 : ${Number(pointValue).toLocaleString()}P`;
+        pointDisplayLabel.textContent = `포인트 : ${Number(pointValue).toLocaleString()}P`;
         pointContainer.classList.remove("hidden");
       }
 
@@ -957,25 +957,25 @@
         histories.forEach(item => {
           const isEarn = item.type === '적립';
           const card = document.createElement("div");
-          card.className = `p-3.5 rounded-2xl bg-white border ${isEarn ? 'border-emerald-100/90' : 'border-rose-100/90'} shadow-2xs flex items-center justify-between gap-3`;
+          card.className = `py-2 px-3 rounded-xl bg-white border ${isEarn ? 'border-emerald-100/90' : 'border-rose-100/90'} shadow-2xs flex items-center justify-between gap-2.5`;
 
           card.innerHTML = `
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-9 h-9 rounded-xl ${isEarn ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/50' : 'bg-rose-50 text-rose-600 border border-rose-200/50'} flex items-center justify-center shrink-0">
-                <i data-lucide="${isEarn ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4.5 h-4.5 stroke-[2.5]"></i>
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-7 h-7 rounded-lg ${isEarn ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/50' : 'bg-rose-50 text-rose-600 border border-rose-200/50'} flex items-center justify-center shrink-0">
+                <i data-lucide="${isEarn ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4 h-4 stroke-[2.5]"></i>
               </div>
               <div class="min-w-0">
                 <div class="flex items-center gap-1.5">
-                  <span class="px-1.5 py-0.5 rounded text-[11px] font-extrabold ${isEarn ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                  <span class="px-1.5 py-[1px] rounded text-[10px] font-extrabold ${isEarn ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
                     ${isEarn ? '적립' : '사용'}
                   </span>
-                  <span class="text-xs sm:text-sm font-bold text-slate-800 truncate">${escapeHtml(item.description || (isEarn ? '포인트 적립' : '포인트 사용'))}</span>
+                  <span class="text-xs font-bold text-slate-800 truncate">${escapeHtml(item.description || (isEarn ? '포인트 적립' : '포인트 사용'))}</span>
                 </div>
-                <div class="text-[11px] font-mono text-slate-400 mt-0.5">${escapeHtml(item.date || "-")}</div>
+                <div class="text-[10px] font-mono text-slate-400 mt-[1px]">${escapeHtml(item.date || "-")}</div>
               </div>
             </div>
             <div class="shrink-0 text-right">
-              <span class="font-extrabold font-mono text-sm sm:text-base ${isEarn ? 'text-emerald-600' : 'text-rose-600'}">
+              <span class="font-extrabold font-mono text-sm ${isEarn ? 'text-emerald-600' : 'text-rose-600'}">
                 ${isEarn ? '+' : '-'}${Number(item.amount).toLocaleString()}P
               </span>
             </div>
