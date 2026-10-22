@@ -354,9 +354,14 @@
           <div><span class="font-bold text-slate-900">매장 위치 :</span> 서울 송파구 송파대로345 헬리오시티 제근린생활시설2b동 1019호</div>
           <div><span class="font-bold text-slate-900">주차 위치 :</span> 헬리오시티상가 2-A 주차장 이용 (무료)</div>
         </div>
-        <div class="rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[200px]">
-          <!-- Added an onerror fallback image just in case the original map image doesn't exist in the same directory -->
-          <img src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover">
+        <div id="mapImageContainer" class="relative rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[200px] cursor-pointer group active:scale-[0.98] transition-all">
+          <img src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105">
+          <div class="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+            <div class="bg-white/90 backdrop-blur-sm px-3 py-2 rounded-full shadow-md text-emerald-700 font-bold text-xs flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
+              <i data-lucide="zoom-in" class="w-4 h-4"></i>
+              <span>지도 크게 보기</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -399,6 +404,21 @@
       <button id="closeCouponsModalBtn" type="button" class="w-full py-3.5 bg-[#34a862] hover:bg-[#2b9454] active:scale-98 text-white rounded-xl text-base font-extrabold shadow-md transition-all cursor-pointer">
         확인
       </button>
+    </div>
+  </div>
+
+  <!-- 이미지 확대 뷰어 모달 -->
+  <div id="imageViewerModal" class="hidden fixed inset-0 z-[70] bg-black/95 backdrop-blur-sm opacity-0 transition-opacity duration-300 flex flex-col touch-none">
+    <div class="flex justify-end p-4 shrink-0">
+      <button id="closeImageViewerBtn" type="button" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-auto flex items-center justify-center p-4 relative" id="imageViewerContainer">
+      <img id="viewerImage" src="" alt="확대된 지도" class="w-full max-w-2xl h-auto object-contain transition-transform duration-300 origin-center cursor-zoom-in" style="max-height: 80vh;">
+    </div>
+    <div class="p-5 text-center text-white/60 text-sm shrink-0 font-medium tracking-tight">
+      이미지를 탭하여 확대/축소하세요
     </div>
   </div>
 
@@ -1394,6 +1414,55 @@
         closeSideMenu();
         loadGoogleSheetData(false);
       });
+
+      // 지도 이미지 확대 뷰어 로직
+      const mapImageContainer = document.getElementById("mapImageContainer");
+      const imageViewerModal = document.getElementById("imageViewerModal");
+      const viewerImage = document.getElementById("viewerImage");
+      const closeImageViewerBtn = document.getElementById("closeImageViewerBtn");
+      let isZoomed = false;
+
+      if (mapImageContainer && imageViewerModal && viewerImage) {
+        mapImageContainer.addEventListener("click", () => {
+          const imgEl = mapImageContainer.querySelector("img");
+          if (imgEl) {
+            viewerImage.src = imgEl.src;
+            viewerImage.style.transform = 'scale(1)';
+            isZoomed = false;
+            viewerImage.classList.remove("cursor-zoom-out");
+            viewerImage.classList.add("cursor-zoom-in");
+            
+            imageViewerModal.classList.remove("hidden");
+            void imageViewerModal.offsetWidth;
+            imageViewerModal.classList.remove("opacity-0");
+          }
+        });
+
+        const closeViewer = () => {
+          imageViewerModal.classList.add("opacity-0");
+          setTimeout(() => imageViewerModal.classList.add("hidden"), 300);
+        };
+
+        closeImageViewerBtn?.addEventListener("click", closeViewer);
+        document.getElementById("imageViewerContainer")?.addEventListener("click", (e) => {
+          // 이미지 밖의 영역(컨테이너 배경)을 클릭했을 때만 닫히도록 처리
+          if (e.target === e.currentTarget) closeViewer();
+        });
+
+        viewerImage.addEventListener("click", (e) => {
+          e.stopPropagation();
+          isZoomed = !isZoomed;
+          if (isZoomed) {
+            viewerImage.style.transform = 'scale(1.8)';
+            viewerImage.classList.remove("cursor-zoom-in");
+            viewerImage.classList.add("cursor-zoom-out");
+          } else {
+            viewerImage.style.transform = 'scale(1)';
+            viewerImage.classList.remove("cursor-zoom-out");
+            viewerImage.classList.add("cursor-zoom-in");
+          }
+        });
+      }
 
       if (window.lucide) lucide.createIcons();
     });
