@@ -376,7 +376,7 @@
           <div><span class="font-bold text-slate-900">주차 위치 :</span> 헬리오시티상가 2-A 주차장 이용 (무료)</div>
         </div>
         <div id="mapImageContainer" class="relative rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[200px] touch-none">
-          <img id="inlineMapImage" src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover transform scale-125 origin-center transition-transform duration-100">
+          <img id="inlineMapImage" src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover transform scale-[1.6] origin-center transition-transform duration-100">
           <div class="absolute bottom-3 right-3 bg-white/80 backdrop-blur-sm px-2.5 py-1.5 rounded-lg shadow-sm text-[11px] text-slate-600 font-bold pointer-events-none flex items-center gap-1.5">
             <i data-lucide="zoom-in" class="w-3.5 h-3.5 text-emerald-600"></i>
             두 손가락으로 확대
@@ -1480,7 +1480,7 @@
       const inlineMapImage = document.getElementById("inlineMapImage");
 
       if (mapImageContainer && inlineMapImage) {
-        let currentScale = 1.25; // 기본적으로 약간 확대된 상태 시작
+        let currentScale = 1.6; // 기본적으로 기존보다 더 확대된 상태(1.6배)로 시작
         let currentX = 0;
         let currentY = 0;
         let startX = 0;
@@ -1490,18 +1490,18 @@
         let isPinching = false;
         let lastTap = 0;
 
-        // CSS의 scale-125와 충돌을 막기 위해 JS로 초기 상태 할당
-        inlineMapImage.classList.remove('scale-125');
-        inlineMapImage.style.transform = `translate(0px, 0px) scale(1.25)`;
+        // CSS의 scale 속성과 충돌을 막기 위해 JS로 초기 상태 할당
+        inlineMapImage.classList.remove('scale-125', 'scale-[1.6]');
+        inlineMapImage.style.transform = `translate(0px, 0px) scale(1.6)`;
 
         const updateTransform = (animate = false) => {
           if (currentScale < 1) currentScale = 1;
           if (currentScale > 4) currentScale = 4;
           
-          if (currentScale <= 1.25) {
+          if (currentScale <= 1.6) {
             currentX = 0;
             currentY = 0;
-            currentScale = 1.25; // 기본 확대 배율 이하로 내려가지 않도록 강제
+            currentScale = 1.6; // 기본 확대 배율 이하로 내려가지 않도록 강제
           }
 
           inlineMapImage.style.transition = animate ? 'transform 0.2s ease-out' : 'none';
@@ -1525,11 +1525,11 @@
             // 더블 탭으로 줌 인/아웃
             if (tapLength < 300 && tapLength > 0) {
               e.preventDefault();
-              currentScale = currentScale > 1.5 ? 1.25 : 2.5;
+              currentScale = currentScale > 2.0 ? 1.6 : 2.5;
               updateTransform(true);
             } else {
-              // 현재 배율이 기본(1.25)보다 클 때만 이미지 내 이동(드래그) 허용, 아니면 모달창 정상 스크롤 허용
-              if (currentScale > 1.25) {
+              // 현재 배율이 기본(1.6)보다 클 때만 이미지 내 이동(드래그) 허용, 아니면 모달창 정상 스크롤 허용
+              if (currentScale > 1.6) {
                 isDragging = true;
                 startX = e.touches[0].pageX - currentX;
                 startY = e.touches[0].pageY - currentY;
@@ -1547,7 +1547,7 @@
             currentScale += scaleDiff;
             initialDistance = currentDistance;
             updateTransform(false);
-          } else if (isDragging && e.touches.length === 1 && currentScale > 1.25) {
+          } else if (isDragging && e.touches.length === 1 && currentScale > 1.6) {
             e.preventDefault(); // 드래그 중 화면 스크롤 방지
             currentX = e.touches[0].pageX - startX;
             currentY = e.touches[0].pageY - startY;
@@ -1563,14 +1563,14 @@
         // PC 환경 더블 클릭 지원
         inlineMapImage.addEventListener('dblclick', (e) => {
           e.preventDefault();
-          currentScale = currentScale > 1.5 ? 1.25 : 2.5;
+          currentScale = currentScale > 2.0 ? 1.6 : 2.5;
           updateTransform(true);
         });
 
         // 모달이 닫힐 때 지도 확대/이동 상태 초기화
         document.getElementById("closeStoreLocationModalBtn")?.addEventListener("click", () => {
           setTimeout(() => {
-            currentScale = 1.25;
+            currentScale = 1.6;
             currentX = 0;
             currentY = 0;
             updateTransform(false);
