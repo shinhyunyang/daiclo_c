@@ -255,7 +255,7 @@
         <strong>숫자 5자리</strong> 비밀번호를 등록하세요.
       </p>
       
-      <input type="tel" style="-webkit-text-security: disc;" id="pin_setup_field" autocomplete="one-time-code" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric" pattern="[0-9]*">
+      <input type="tel" id="pin_setup_field" data-value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric">
       
       <div class="flex gap-2 justify-center">
         <button id="cancelSetPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
@@ -276,7 +276,7 @@
         설정하신 <strong>비밀번호</strong>를 입력해 주세요.
       </p>
       
-      <input type="tel" style="-webkit-text-security: disc;" id="pin_verify_field" autocomplete="one-time-code" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric" pattern="[0-9]*">
+      <input type="tel" id="pin_verify_field" data-value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric">
       
       <div class="flex gap-2 justify-center">
         <button id="cancelVerifyMemberPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
@@ -297,7 +297,7 @@
         <strong>관리자 비밀번호</strong>를 입력해 주세요.
       </p>
       
-      <input type="tel" style="-webkit-text-security: disc;" id="admin_code_field" autocomplete="one-time-code" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+      <input type="tel" id="admin_code_field" data-value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="••••" maxlength="4" inputmode="numeric">
       
       <div class="flex gap-2 justify-center">
         <button id="cancelAdminPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
@@ -837,6 +837,7 @@
 
       if (nickText) nickText.textContent = nick;
       pwdInput.value = "";
+      pwdInput.setAttribute("data-value", "");
 
       modal.classList.remove("hidden");
       void modal.offsetWidth;
@@ -865,6 +866,7 @@
 
       if (nickText) nickText.textContent = nick;
       pwdInput.value = "";
+      pwdInput.setAttribute("data-value", "");
 
       modal.classList.remove("hidden");
       void modal.offsetWidth;
@@ -890,6 +892,7 @@
       if (!modal || !modalContent || !pwdInput) return;
 
       pwdInput.value = "";
+      pwdInput.setAttribute("data-value", "");
 
       modal.classList.remove("hidden");
       void modal.offsetWidth;
@@ -1272,35 +1275,50 @@
 
       document.getElementById("cancelSetPwdBtn")?.addEventListener("click", closeMemberSetPwdModal);
       
-      const pwdInputElem = document.getElementById("pin_setup_field");
-      if (pwdInputElem) {
-        pwdInputElem.addEventListener("keypress", (e) => {
-          if (!/[0-9]/.test(e.key) && e.key !== 'Enter') {
-            e.preventDefault();
-            showToast("숫자5자리를 입력해주세요", "error");
+      // 모바일 키체인/비밀번호 제안 팝업 우회를 위한 자바스크립트 기반 마스킹 함수
+      function applyPinMasking(inputId) {
+        const inputElem = document.getElementById(inputId);
+        if (!inputElem) return;
+        
+        inputElem.addEventListener('input', (e) => {
+          let input = e.target;
+          let rawVal = input.value;
+          let dataVal = input.getAttribute('data-value') || "";
+          
+          if (rawVal.length < dataVal.length) {
+            // 글자를 지웠을 때
+            dataVal = dataVal.substring(0, rawVal.length);
+          } else {
+            // 글자를 추가했을 때 (까만 점(•) 외의 새 숫자만 추출)
+            let newChars = rawVal.replace(/[•]/g, '').replace(/[^0-9]/g, '');
+            dataVal = dataVal + newChars;
           }
+          
+          let max = parseInt(input.getAttribute('maxlength')) || 5;
+          dataVal = dataVal.substring(0, max);
+          
+          input.setAttribute('data-value', dataVal);
+          input.value = '•'.repeat(dataVal.length); // 화면에는 항상 • 으로 표시
         });
 
-        pwdInputElem.addEventListener("input", (e) => {
-          const val = e.target.value;
-          if (/[^0-9]/g.test(val)) {
-            e.target.value = val.replace(/[^0-9]/g, '');
-            showToast("숫자5자리를 입력해주세요", "error");
-          }
-        });
-
-        pwdInputElem.addEventListener("keydown", (e) => {
+        inputElem.addEventListener("keydown", (e) => {
           if (e.key === "Enter") {
-            document.getElementById("confirmSetPwdBtn")?.click();
+            if (inputId === "pin_setup_field") document.getElementById("confirmSetPwdBtn")?.click();
+            if (inputId === "pin_verify_field") document.getElementById("confirmVerifyMemberPwdBtn")?.click();
+            if (inputId === "admin_code_field") document.getElementById("confirmAdminPwdBtn")?.click();
           }
         });
       }
+
+      applyPinMasking("pin_setup_field");
+      applyPinMasking("pin_verify_field");
+      applyPinMasking("admin_code_field");
 
       // [비밀번호 등록 확정 처리기]
       document.getElementById("confirmSetPwdBtn")?.addEventListener("click", async () => {
         const pwdInput = document.getElementById("pin_setup_field");
         const confirmBtn = document.getElementById("confirmSetPwdBtn");
-        const pwd = (pwdInput ? pwdInput.value : "").trim();
+        const pwd = (pwdInput ? pwdInput.getAttribute('data-value') : "").trim();
         
         if (pwd.length !== 5 || !/^\d{5}$/.test(pwd)) {
           showToast("숫자5자리를 입력해주세요", "error");
@@ -1367,7 +1385,7 @@
       document.getElementById("cancelVerifyMemberPwdBtn")?.addEventListener("click", closeMemberVerifyPwdModal);
       document.getElementById("confirmVerifyMemberPwdBtn")?.addEventListener("click", () => {
         const pwdInput = document.getElementById("pin_verify_field");
-        const entered = (pwdInput ? pwdInput.value : "").trim();
+        const entered = (pwdInput ? pwdInput.getAttribute('data-value') : "").trim();
         const expected = memberPasswordMap[selectedMemberForPassword];
 
         const ADMIN_MASTER_PASS = "0718";
@@ -1382,27 +1400,16 @@
           showToast("비밀번호가 일치하지 않습니다.", "error");
           if (pwdInput) {
             pwdInput.value = "";
+            pwdInput.setAttribute("data-value", "");
             pwdInput.focus();
           }
         }
       });
 
-      const verifyPwdInputElem = document.getElementById("pin_verify_field");
-      if (verifyPwdInputElem) {
-        verifyPwdInputElem.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
-            document.getElementById("confirmVerifyMemberPwdBtn")?.click();
-          }
-        });
-        verifyPwdInputElem.addEventListener("input", (e) => {
-          e.target.value = e.target.value.replace(/[^0-9]/g, '');
-        });
-      }
-
       document.getElementById("cancelAdminPwdBtn")?.addEventListener("click", closeAdminVerifyPwdModal);
       document.getElementById("confirmAdminPwdBtn")?.addEventListener("click", () => {
         const pwdInput = document.getElementById("admin_code_field");
-        const entered = (pwdInput ? pwdInput.value : "").trim();
+        const entered = (pwdInput ? pwdInput.getAttribute('data-value') : "").trim();
         const ADMIN_MASTER_PASS = "0718";
 
         if (entered === ADMIN_MASTER_PASS) {
@@ -1413,22 +1420,11 @@
           showToast("관리자 비밀번호가 일치하지 않습니다.", "error");
           if (pwdInput) {
             pwdInput.value = "";
+            pwdInput.setAttribute("data-value", "");
             pwdInput.focus();
           }
         }
       });
-
-      const inputAdminPwdElem = document.getElementById("admin_code_field");
-      if (inputAdminPwdElem) {
-        inputAdminPwdElem.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
-            document.getElementById("confirmAdminPwdBtn")?.click();
-          }
-        });
-        inputAdminPwdElem.addEventListener("input", (e) => {
-          e.target.value = e.target.value.replace(/[^0-9]/g, '');
-        });
-      }
 
       // 지도 이미지 팝업 내 인라인 확대/축소 로직 (터치 핀치 줌 및 드래그, 더블탭 지원)
       const mapImageContainer = document.getElementById("mapImageContainer");
