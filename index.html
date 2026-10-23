@@ -162,7 +162,7 @@
 
         <!-- 보유 포인트 표시 영역 -->
         <div id="userPointInfoContainer" class="hidden mt-2 pt-1.5 flex items-center justify-between px-4 py-2.5 bg-white/20 rounded-xl text-white font-extrabold text-base sm:text-lg select-none backdrop-blur-xs">
-          <span id="userPointDisplayLabel">보유 포인트 : 0P</span>
+          <span id="userPointDisplayLabel">포인트 : 0P</span>
           <div class="flex items-center gap-1.5 shrink-0">
             <button id="openPointHistoryModalBtn" type="button" class="shrink-0 px-3 py-1.5 bg-white/90 hover:bg-white text-[#278b4e] active:scale-95 text-xs sm:text-sm font-extrabold rounded-lg shadow-sm transition-all cursor-pointer">
               적립/사용 내역
@@ -945,7 +945,7 @@
       const pointValue = memberPointsMap[exactNickKey] !== undefined ? memberPointsMap[exactNickKey] : 0;
       
       if (pointContainer && pointDisplayLabel) {
-        pointDisplayLabel.textContent = `보유 포인트 : ${Number(pointValue).toLocaleString()}P`;
+        pointDisplayLabel.textContent = `포인트 : ${Number(pointValue).toLocaleString()}P`;
         pointContainer.classList.remove("hidden");
       }
 
