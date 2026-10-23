@@ -164,7 +164,7 @@
         <div id="userPointInfoContainer" class="hidden mt-2 pt-1.5 flex items-center justify-between px-4 py-2.5 bg-white/20 rounded-xl text-white font-extrabold text-base sm:text-lg select-none backdrop-blur-xs">
           <span id="userPointDisplayLabel">포인트 : 0P</span>
           <div class="flex items-center gap-1.5 shrink-0">
-            <button id="openPointHistoryModalBtn" type="button" class="shrink-0 px-3 py-1.5 bg-white/90 hover:bg-white text-[#278b4e] active:scale-95 text-xs sm:text-sm font-extrabold rounded-lg shadow-sm border border-transparent transition-all cursor-pointer">
+            <button id="openPointHistoryModalBtn" type="button" class="shrink-0 px-3 py-1.5 bg-white hover:bg-emerald-50 text-[#278b4e] active:scale-95 text-xs sm:text-sm font-extrabold rounded-lg shadow-sm border border-transparent transition-all cursor-pointer">
               적립/사용
             </button>
             <button id="openUsePointModalBtn" type="button" class="shrink-0 px-3 py-1.5 bg-white text-[#278b4e] hover:bg-emerald-50 active:scale-95 text-xs sm:text-sm font-extrabold rounded-lg shadow-sm border border-transparent transition-all cursor-pointer">
@@ -281,7 +281,7 @@
         <button id="confirmVerifyMemberPwdBtn" type="button" class="flex-1 px-4 py-3 text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl transition-colors cursor-pointer">확인</button>
       </div>
 
-      <!-- 비밀번호 불일치 시 나타나는 안내 문구 (테두리 삭제 및 3초 후 자동 사라짐) -->
+      <!-- 비밀번호 불일치 시 나타나는 안내 문구 -->
       <div id="verifyPwdErrorMsg" class="hidden mt-3.5 text-xs sm:text-sm font-extrabold text-rose-600 bg-rose-50 py-2.5 px-3 rounded-xl transition-all">
         비밀번호가 잘못입력되었습니다. 다시 입력해주세요
       </div>
@@ -379,7 +379,7 @@
           <div><span class="font-bold text-slate-900">주차 위치 :</span> 헬리오시티상가 2-A 주차장 이용 (무료)</div>
         </div>
         <div id="mapImageContainer" class="relative rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[350px] touch-none">
-          <img id="inlineMapImage" src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover transform scale-[1.6] origin-center transition-transform duration-100">
+          <img id="inlineMapImage" src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover origin-center transition-transform duration-100">
           
           <div class="absolute bottom-3 right-3 flex flex-col gap-2 z-10">
             <button id="zoomInBtn" type="button" aria-label="확대" class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-xl shadow-md flex items-center justify-center text-slate-700 hover:bg-slate-50 active:scale-95 transition-all border border-slate-200 cursor-pointer">
@@ -445,13 +445,13 @@
 
   <script>
     const SHEET_ID = "11OG6u2i64D6exMiBgqGbkq-wrmxrYrVfLSzbYsBoXC8";
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyvRsB4cUdnC0DgFz4TJcgmN7_YCf-4dO0MG4SMP0JsDb5BNLZLEY1bPxpA2YKuboAC/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_pWTO0GPruQQcCtuG2A_3L_fHM1wxi-9E1wFGCOKK9VeIYMEswkg8WsCbrmlX-Ito/exec";
 
     const SAMPLE_INITIAL_ORDERS = [
-      { id: 'ORD-2', sheetRowIndex: 2, orderDate: '2026.10.15', pickupDate: '2026.10.21', nickname: '헬리오1234', productName: 'DAICLO 프리미엄 에어로 쿨링 셔츠', quantity: 2, amount: 58000, status: '픽업예정' },
-      { id: 'ORD-3', sheetRowIndex: 3, orderDate: '2026.10.16', pickupDate: '2026.10.22', nickname: '헬리오1234', productName: 'DAICLO 컴포트 슬랙스 네이비 (L)', quantity: 1, amount: 39000, status: '픽업예정' },
+      { id: 'ORD-2', sheetRowIndex: 2, orderDate: '2026.10.15', pickupDate: '2026.10.23', nickname: '헬리오1234', productName: 'DAICLO 프리미엄 에어로 쿨링 셔츠', quantity: 2, amount: 58000, status: '픽업예정' },
+      { id: 'ORD-3', sheetRowIndex: 3, orderDate: '2026.10.16', pickupDate: '2026.10.24', nickname: '헬리오1234', productName: 'DAICLO 컴포트 슬랙스 네이비 (L)', quantity: 1, amount: 39000, status: '픽업예정' },
       { id: 'ORD-4', sheetRowIndex: 4, orderDate: '2026.10.14', pickupDate: '2026.10.18', nickname: '송파러버', productName: 'DAICLO 방수 윈드브레이커 자켓', quantity: 1, amount: 72000, status: '완료' },
-      { id: 'ORD-5', sheetRowIndex: 5, orderDate: '2026.10.18', pickupDate: '2026.10.23', nickname: '1234', productName: '데일리 오가닉 코튼 티셔츠 3팩', quantity: 1, amount: 29900, status: '픽업예정' }
+      { id: 'ORD-5', sheetRowIndex: 5, orderDate: '2026.10.18', pickupDate: '2026.10.25', nickname: '1234', productName: '데일리 오가닉 코튼 티셔츠 3팩', quantity: 1, amount: 29900, status: '픽업예정' }
     ];
 
     let ordersData = [...SAMPLE_INITIAL_ORDERS];
@@ -464,6 +464,44 @@
     let multiNicknameChoices = [];
     let selectedMemberForPassword = "";
     let toastTimer = null;
+
+    // [조회이력 중복 방지 캐시 변수]
+    let lastLogKey = "";
+    let lastLogTime = 0;
+
+    // [조회이력 기록 헬퍼 함수] - 중복 전송 방지 및 단일 비콘 전송
+    function logSearchHistory(type, content) {
+      const cleanContent = String(content || "").trim();
+      if (!cleanContent) return;
+
+      const nowTime = Date.now();
+      const currentKey = `${type}_${cleanContent}`;
+      // 1.5초 이내에 동일한 구분과 내용으로 요청이 들어오면 중복 전송 차단
+      if (currentKey === lastLogKey && (nowTime - lastLogTime < 1500)) {
+        return;
+      }
+      lastLogKey = currentKey;
+      lastLogTime = nowTime;
+
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const timestamp = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+      // CORS 차단 없이 가장 확실하고 가볍게 1회만 전송하는 Image Beacon 방식 단독 사용
+      try {
+        const queryParams = new URLSearchParams({
+          action: "logSearch",
+          logType: type,
+          content: cleanContent,
+          timestamp: timestamp,
+          _nocache: nowTime
+        });
+        const beaconImg = new Image();
+        beaconImg.src = `${GAS_WEB_APP_URL}?${queryParams.toString()}`;
+      } catch (e) {
+        console.warn("Log error:", e);
+      }
+    }
 
     function showToast(message, type = "success") {
       const toast = document.getElementById("toastNotification");
@@ -930,6 +968,9 @@
       activeSelectedNickname = nick;
       searchQuery = nick;
       
+      // 닉네임 선택/확정 시 '닉네임클릭' 구분으로 조회이력 전송
+      logSearchHistory("닉네임클릭", nick);
+
       if (searchInput) {
         searchInput.value = nick;
         searchInput.blur();
@@ -1081,6 +1122,9 @@
         showToast("검색할 닉네임을 입력해 주세요.", "error");
         return;
       }
+
+      // 1. 조회창 입력 후 조회버튼(또는 엔터) 클릭 시 '조회버튼' 구분으로 구글시트 조회이력에 기록
+      logSearchHistory("조회버튼", val);
 
       searchQuery = val;
       const allNicknames = [...new Set(ordersData.map(o => (o.nickname || "").trim()).filter(Boolean))];
@@ -1399,7 +1443,7 @@
 
       document.getElementById("cancelVerifyMemberPwdBtn")?.addEventListener("click", closeMemberVerifyPwdModal);
       
-      // [비밀번호 확인 처리기] - 불일치 시 팝업 내부 하단 안내문구 계속 유지
+      // [비밀번호 확인 처리기] - 불일치 시 안내문구 유지
       document.getElementById("confirmVerifyMemberPwdBtn")?.addEventListener("click", () => {
         const pwdInput = document.getElementById("pin_verify_field");
         const errorMsgElem = document.getElementById("verifyPwdErrorMsg");
@@ -1416,7 +1460,7 @@
             showToast("관리자 권한으로 조회되었습니다.", "info");
           }
         } else {
-          // 비밀번호 불일치: 3초 자동 숨김 없이 안내문구 유지
+          // 비밀번호 불일치: 안내문구 유지
           if (errorMsgElem) {
             errorMsgElem.classList.remove("hidden");
           }
@@ -1449,7 +1493,7 @@
         }
       });
 
-      // 지도 이미지 팝업 내 인라인 확대/축소 로직
+      // 지도 이미지 팝업 내 인라인 확대/축소 및 드래그 로직
       const mapImageContainer = document.getElementById("mapImageContainer");
       const inlineMapImage = document.getElementById("inlineMapImage");
 
@@ -1464,12 +1508,11 @@
         let isPinching = false;
         let lastTap = 0;
 
-        inlineMapImage.classList.remove('scale-125', 'scale-[1.6]', 'scale-[2.2]', 'scale-[2.64]');
         inlineMapImage.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
 
         const updateTransform = (animate = false) => {
           if (currentScale < 1) currentScale = 1;
-          if (currentScale > 4) currentScale = 4;
+          if (currentScale > 4.5) currentScale = 4.5;
           
           if (currentScale <= 1.0) {
             currentX = 0;
