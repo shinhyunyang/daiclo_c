@@ -1189,16 +1189,20 @@
             <div class="text-base sm:text-lg font-extrabold tracking-tight truncate flex-1 ${isComplete ? 'text-emerald-950/90' : 'text-slate-900'}">
               ${escapeHtml(order.productName || "상품명 없음")}
             </div>
-            ${isTodayPickup ? `<span class="shrink-0 px-2.5 py-1.5 rounded-lg bg-[#2EA35C] text-white font-extrabold text-[11px] sm:text-xs shadow-sm inline-flex items-center justify-center text-center whitespace-nowrap"><span>오늘 픽업일이예요</span></span>` : ''}
-            ${isPastPickup ? `<span class="shrink-0 px-2.5 py-1.5 rounded-lg bg-red-500 text-white font-extrabold text-[11px] sm:text-xs shadow-sm inline-flex items-center justify-center text-center whitespace-nowrap"><span>픽업 부탁드려요</span></span>` : ''}
           </div>
 
-          <div class="flex items-center gap-1.5 text-[13px] sm:text-sm font-bold text-slate-800">
-            <span>${Number(unitPrice).toLocaleString()}원</span>
-            <span class="${isComplete ? 'text-emerald-700 font-bold' : 'text-slate-300'}">/</span>
-            <span>${order.quantity}개</span>
-            <span class="${isComplete ? 'text-emerald-700 font-bold' : 'text-slate-300'}">/</span>
-            <span class="${isComplete ? 'text-emerald-900' : 'text-slate-900'} font-extrabold text-base sm:text-lg">${Number(order.amount).toLocaleString()}원</span>
+          <div class="flex items-center justify-between gap-1.5">
+            <div class="flex items-center gap-1.5 text-[13px] sm:text-sm font-bold text-slate-800">
+              <span>${Number(unitPrice).toLocaleString()}원</span>
+              <span class="${isComplete ? 'text-emerald-700 font-bold' : 'text-slate-300'}">/</span>
+              <span>${order.quantity}개</span>
+              <span class="${isComplete ? 'text-emerald-700 font-bold' : 'text-slate-300'}">/</span>
+              <span class="${isComplete ? 'text-emerald-900' : 'text-slate-900'} font-extrabold text-base sm:text-lg">${Number(order.amount).toLocaleString()}원</span>
+            </div>
+            <div class="shrink-0 flex items-center">
+              ${isTodayPickup ? `<span class="px-2.5 py-1.5 rounded-lg bg-[#2EA35C] text-white font-extrabold text-[11px] sm:text-xs shadow-sm inline-flex items-center justify-center text-center whitespace-nowrap">오늘 픽업일이예요</span>` : ''}
+              ${isPastPickup ? `<span class="px-2.5 py-1.5 rounded-lg bg-red-500 text-white font-extrabold text-[11px] sm:text-xs shadow-sm inline-flex items-center justify-center text-center whitespace-nowrap">픽업 부탁드려요</span>` : ''}
+            </div>
           </div>
 
           <div class="flex items-center justify-between gap-1.5 pt-1.5 border-t ${isComplete ? 'border-emerald-900/20' : (isTodayPickup ? 'border-emerald-200' : (isPastPickup ? 'border-red-200' : 'border-emerald-100'))} text-[11px] sm:text-[13px] font-medium">
