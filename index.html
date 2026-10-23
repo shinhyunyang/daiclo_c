@@ -255,7 +255,7 @@
         <strong>숫자 5자리</strong> 비밀번호를 등록하세요.
       </p>
       
-      <input type="text" style="-webkit-text-security: disc;" id="inputNewMemberPwd" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric" pattern="[0-9]*">
+      <input type="tel" style="-webkit-text-security: disc;" id="pin_setup_field" autocomplete="one-time-code" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric" pattern="[0-9]*">
       
       <div class="flex gap-2 justify-center">
         <button id="cancelSetPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
@@ -276,7 +276,7 @@
         설정하신 <strong>비밀번호</strong>를 입력해 주세요.
       </p>
       
-      <input type="text" style="-webkit-text-security: disc;" id="inputVerifyMemberPwd" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric" pattern="[0-9]*">
+      <input type="tel" style="-webkit-text-security: disc;" id="pin_verify_field" autocomplete="one-time-code" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric" pattern="[0-9]*">
       
       <div class="flex gap-2 justify-center">
         <button id="cancelVerifyMemberPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
@@ -297,49 +297,7 @@
         <strong>관리자 비밀번호</strong>를 입력해 주세요.
       </p>
       
-      <input type="text" style="-webkit-text-security: disc;" id="inputAdminPwd" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
-      
-      <div class="flex gap-2 justify-center">
-        <button id="cancelSetPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
-        <button id="confirmSetPwdBtn" type="button" class="flex-1 px-4 py-3 text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl transition-colors cursor-pointer">등록하기</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 비밀번호 확인 모달 -->
-  <div id="memberVerifyPwdModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-200 p-7 text-center border border-emerald-100" id="memberVerifyPwdModalContent">
-      <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-3">
-        <i data-lucide="lock" class="w-6 h-6"></i>
-      </div>
-      <h3 class="text-xl font-extrabold text-slate-800 mb-1">비밀번호 확인</h3>
-      <p class="text-xs text-slate-600 mb-5 leading-relaxed">
-        <span id="targetNickVerifyText" class="font-bold text-emerald-700"></span> 님의 주문 조회를 위해<br>
-        설정하신 <strong>비밀번호</strong>를 입력해 주세요.
-      </p>
-      
-      <input type="password" id="inputVerifyMemberPwd" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric" pattern="[0-9]*">
-      
-      <div class="flex gap-2 justify-center">
-        <button id="cancelVerifyMemberPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
-        <button id="confirmVerifyMemberPwdBtn" type="button" class="flex-1 px-4 py-3 text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl transition-colors cursor-pointer">확인</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 관리자 비밀번호 확인 모달 -->
-  <div id="adminVerifyPwdModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-200 p-7 text-center border border-emerald-100" id="adminVerifyPwdModalContent">
-      <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-3">
-        <i data-lucide="shield-alert" class="w-6 h-6"></i>
-      </div>
-      <h3 class="text-xl font-extrabold text-slate-800 mb-1">관리자 확인</h3>
-      <p class="text-xs text-slate-600 mb-5 leading-relaxed">
-        DB 업데이트(새로고침)를 위해<br>
-        <strong>관리자 비밀번호</strong>를 입력해 주세요.
-      </p>
-      
-      <input type="password" id="inputAdminPwd" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+      <input type="tel" style="-webkit-text-security: disc;" id="admin_code_field" autocomplete="one-time-code" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
       
       <div class="flex gap-2 justify-center">
         <button id="cancelAdminPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
@@ -417,11 +375,16 @@
           <div><span class="font-bold text-slate-900">매장 위치 :</span> 서울 송파구 송파대로345 헬리오시티 제근린생활시설2b동 1019호</div>
           <div><span class="font-bold text-slate-900">주차 위치 :</span> 헬리오시티상가 2-A 주차장 이용 (무료)</div>
         </div>
-        <div id="mapImageContainer" class="relative rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[200px] touch-none">
+        <div id="mapImageContainer" class="relative rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[350px] touch-none">
           <img id="inlineMapImage" src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover transform scale-[1.6] origin-center transition-transform duration-100">
-          <div class="absolute bottom-3 right-3 bg-white/80 backdrop-blur-sm px-2.5 py-1.5 rounded-lg shadow-sm text-[11px] text-slate-600 font-bold pointer-events-none flex items-center gap-1.5">
-            <i data-lucide="zoom-in" class="w-3.5 h-3.5 text-emerald-600"></i>
-            두 손가락으로 확대
+          
+          <div class="absolute bottom-3 right-3 flex flex-col gap-2 z-10">
+            <button id="zoomInBtn" type="button" aria-label="확대" class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-xl shadow-md flex items-center justify-center text-slate-700 hover:bg-slate-50 active:scale-95 transition-all border border-slate-200 cursor-pointer">
+              <i data-lucide="plus" class="w-6 h-6"></i>
+            </button>
+            <button id="zoomOutBtn" type="button" aria-label="축소" class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-xl shadow-md flex items-center justify-center text-slate-700 hover:bg-slate-50 active:scale-95 transition-all border border-slate-200 cursor-pointer">
+              <i data-lucide="minus" class="w-6 h-6"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -869,7 +832,7 @@
       const modal = document.getElementById("memberSetPwdModal");
       const modalContent = document.getElementById("memberSetPwdModalContent");
       const nickText = document.getElementById("targetNickSetText");
-      const pwdInput = document.getElementById("inputNewMemberPwd");
+      const pwdInput = document.getElementById("pin_setup_field");
       if (!modal || !modalContent || !pwdInput) return;
 
       if (nickText) nickText.textContent = nick;
@@ -897,7 +860,7 @@
       const modal = document.getElementById("memberVerifyPwdModal");
       const modalContent = document.getElementById("memberVerifyPwdModalContent");
       const nickText = document.getElementById("targetNickVerifyText");
-      const pwdInput = document.getElementById("inputVerifyMemberPwd");
+      const pwdInput = document.getElementById("pin_verify_field");
       if (!modal || !modalContent || !pwdInput) return;
 
       if (nickText) nickText.textContent = nick;
@@ -923,7 +886,7 @@
     function openAdminVerifyPwdModal() {
       const modal = document.getElementById("adminVerifyPwdModal");
       const modalContent = document.getElementById("adminVerifyPwdModalContent");
-      const pwdInput = document.getElementById("inputAdminPwd");
+      const pwdInput = document.getElementById("admin_code_field");
       if (!modal || !modalContent || !pwdInput) return;
 
       pwdInput.value = "";
@@ -1309,7 +1272,7 @@
 
       document.getElementById("cancelSetPwdBtn")?.addEventListener("click", closeMemberSetPwdModal);
       
-      const pwdInputElem = document.getElementById("inputNewMemberPwd");
+      const pwdInputElem = document.getElementById("pin_setup_field");
       if (pwdInputElem) {
         pwdInputElem.addEventListener("keypress", (e) => {
           if (!/[0-9]/.test(e.key) && e.key !== 'Enter') {
@@ -1335,7 +1298,7 @@
 
       // [비밀번호 등록 확정 처리기]
       document.getElementById("confirmSetPwdBtn")?.addEventListener("click", async () => {
-        const pwdInput = document.getElementById("inputNewMemberPwd");
+        const pwdInput = document.getElementById("pin_setup_field");
         const confirmBtn = document.getElementById("confirmSetPwdBtn");
         const pwd = (pwdInput ? pwdInput.value : "").trim();
         
@@ -1403,7 +1366,7 @@
 
       document.getElementById("cancelVerifyMemberPwdBtn")?.addEventListener("click", closeMemberVerifyPwdModal);
       document.getElementById("confirmVerifyMemberPwdBtn")?.addEventListener("click", () => {
-        const pwdInput = document.getElementById("inputVerifyMemberPwd");
+        const pwdInput = document.getElementById("pin_verify_field");
         const entered = (pwdInput ? pwdInput.value : "").trim();
         const expected = memberPasswordMap[selectedMemberForPassword];
 
@@ -1424,7 +1387,7 @@
         }
       });
 
-      const verifyPwdInputElem = document.getElementById("inputVerifyMemberPwd");
+      const verifyPwdInputElem = document.getElementById("pin_verify_field");
       if (verifyPwdInputElem) {
         verifyPwdInputElem.addEventListener("keydown", (e) => {
           if (e.key === "Enter") {
@@ -1436,59 +1399,9 @@
         });
       }
 
-      const sideMenuDrawerBackdrop = document.getElementById("sideMenuDrawerBackdrop");
-      const sideMenuDrawer = document.getElementById("sideMenuDrawer");
-
-      const openSideMenu = () => {
-        if (!sideMenuDrawerBackdrop || !sideMenuDrawer) return;
-        sideMenuDrawerBackdrop.classList.remove("hidden");
-        void sideMenuDrawerBackdrop.offsetWidth;
-        sideMenuDrawerBackdrop.classList.remove("opacity-0", "pointer-events-none");
-        sideMenuDrawer.classList.remove("translate-x-full");
-      };
-
-      const closeSideMenu = () => {
-        if (!sideMenuDrawerBackdrop || !sideMenuDrawer) return;
-        sideMenuDrawerBackdrop.classList.add("opacity-0", "pointer-events-none");
-        sideMenuDrawer.classList.add("translate-x-full");
-        setTimeout(() => sideMenuDrawerBackdrop.classList.add("hidden"), 300);
-      };
-
-      document.getElementById("hamburgerMenuBtn")?.addEventListener("click", openSideMenu);
-      document.getElementById("closeSideMenuBtn")?.addEventListener("click", closeSideMenu);
-      sideMenuDrawerBackdrop?.addEventListener("click", (e) => {
-        if (e.target === sideMenuDrawerBackdrop) closeSideMenu();
-      });
-
-      const storeModal = document.getElementById("storeLocationModal");
-      const storeModalContent = document.getElementById("storeLocationModalContent");
-      document.getElementById("navStoreLocationBtn")?.addEventListener("click", () => {
-        closeSideMenu();
-        storeModal.classList.remove("hidden");
-        void storeModal.offsetWidth;
-        storeModal.classList.remove("opacity-0", "pointer-events-none");
-        storeLocationModalContent.classList.remove("scale-95");
-      });
-      document.getElementById("closeStoreLocationModalBtn")?.addEventListener("click", () => {
-        storeModal.classList.add("opacity-0", "pointer-events-none");
-        storeLocationModalContent.classList.add("scale-95");
-        setTimeout(() => storeModal.classList.add("hidden"), 200);
-      });
-
-      const couponsModal = document.getElementById("couponsModal");
-      const couponsModalContent = document.getElementById("couponsModalContent");
-      document.getElementById("navCouponsBtn")?.addEventListener("click", () => {
-        closeSideMenu();
-        openCouponsModal();
-      });
-      document.getElementById("drawerDbUpdateBtn")?.addEventListener("click", () => {
-        closeSideMenu();
-        openAdminVerifyPwdModal();
-      });
-
       document.getElementById("cancelAdminPwdBtn")?.addEventListener("click", closeAdminVerifyPwdModal);
       document.getElementById("confirmAdminPwdBtn")?.addEventListener("click", () => {
-        const pwdInput = document.getElementById("inputAdminPwd");
+        const pwdInput = document.getElementById("admin_code_field");
         const entered = (pwdInput ? pwdInput.value : "").trim();
         const ADMIN_MASTER_PASS = "0718";
 
@@ -1505,7 +1418,7 @@
         }
       });
 
-      const inputAdminPwdElem = document.getElementById("inputAdminPwd");
+      const inputAdminPwdElem = document.getElementById("admin_code_field");
       if (inputAdminPwdElem) {
         inputAdminPwdElem.addEventListener("keydown", (e) => {
           if (e.key === "Enter") {
@@ -1553,6 +1466,21 @@
         const getDistance = (touches) => {
           return Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
         };
+
+        // 확대/축소 버튼 동작 이벤트
+        document.getElementById("zoomInBtn")?.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          currentScale += 0.5;
+          updateTransform(true);
+        });
+
+        document.getElementById("zoomOutBtn")?.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          currentScale -= 0.5;
+          updateTransform(true);
+        });
 
         mapImageContainer.addEventListener('touchstart', (e) => {
           if (e.touches.length === 2) {
@@ -1617,8 +1545,77 @@
             currentY = 0;
             updateTransform(false);
           }, 300);
+          
+          // 매장 위치 모달 닫기 UI 처리
+          const storeModal = document.getElementById("storeLocationModal");
+          const storeModalContent = document.getElementById("storeLocationModalContent");
+          if(storeModal && storeModalContent) {
+            storeModal.classList.add("opacity-0", "pointer-events-none");
+            storeModalContent.classList.add("scale-95");
+            setTimeout(() => storeModal.classList.add("hidden"), 200);
+          }
         });
       }
+
+      // [사이드 드로어(햄버거) 메뉴 및 네비게이션 버튼 로직 복원]
+      const sideMenuDrawerBackdrop = document.getElementById("sideMenuDrawerBackdrop");
+      const sideMenuDrawer = document.getElementById("sideMenuDrawer");
+
+      const openSideMenu = () => {
+        if (!sideMenuDrawerBackdrop || !sideMenuDrawer) return;
+        sideMenuDrawerBackdrop.classList.remove("hidden");
+        void sideMenuDrawerBackdrop.offsetWidth;
+        sideMenuDrawerBackdrop.classList.remove("opacity-0", "pointer-events-none");
+        sideMenuDrawer.classList.remove("translate-x-full");
+      };
+
+      const closeSideMenu = () => {
+        if (!sideMenuDrawerBackdrop || !sideMenuDrawer) return;
+        sideMenuDrawerBackdrop.classList.add("opacity-0", "pointer-events-none");
+        sideMenuDrawer.classList.add("translate-x-full");
+        setTimeout(() => sideMenuDrawerBackdrop.classList.add("hidden"), 300);
+      };
+
+      document.getElementById("hamburgerMenuBtn")?.addEventListener("click", openSideMenu);
+      document.getElementById("closeSideMenuBtn")?.addEventListener("click", closeSideMenu);
+      sideMenuDrawerBackdrop?.addEventListener("click", (e) => {
+        if (e.target === sideMenuDrawerBackdrop) closeSideMenu();
+      });
+
+      // 매장 위치 및 주차안내 버튼 (사이드 메뉴)
+      document.getElementById("navStoreLocationBtn")?.addEventListener("click", () => {
+        closeSideMenu();
+        const storeModal = document.getElementById("storeLocationModal");
+        const storeModalContent = document.getElementById("storeLocationModalContent");
+        if(storeModal && storeModalContent) {
+            storeModal.classList.remove("hidden");
+            void storeModal.offsetWidth;
+            storeModal.classList.remove("opacity-0", "pointer-events-none");
+            storeModalContent.classList.remove("scale-95");
+        }
+      });
+
+      // 포인트 사용 안내 버튼 (사이드 메뉴)
+      document.getElementById("navCouponsBtn")?.addEventListener("click", () => {
+        closeSideMenu();
+        const couponsModal = document.getElementById("couponsModal");
+        const couponsModalContent = document.getElementById("couponsModalContent");
+        if (couponsModal && couponsModalContent) {
+            couponsModal.classList.remove("hidden");
+            void couponsModal.offsetWidth;
+            couponsModal.classList.remove("opacity-0", "pointer-events-none");
+            couponsModalContent.classList.remove("scale-95");
+            if (window.lucide) lucide.createIcons();
+        }
+      });
+
+      // DB 업데이트 버튼 (사이드 메뉴) - 관리자 암호 팝업으로 연결
+      document.getElementById("drawerDbUpdateBtn")?.addEventListener("click", () => {
+        closeSideMenu();
+        if (typeof openAdminVerifyPwdModal === "function") {
+          openAdminVerifyPwdModal();
+        }
+      });
 
       if (window.lucide) lucide.createIcons();
     });
