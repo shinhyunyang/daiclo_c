@@ -460,21 +460,30 @@
     let activeSelectedNickname = "";
     let multiNicknameChoices = [];
     let selectedMemberForPassword = "";
+    let toastTimer = null; // 알림창 타이머 중복 방지용 변수 추가
 
     function showToast(message, type = "success") {
       const toast = document.getElementById("toastNotification");
       const toastMsg = document.getElementById("toastMessage");
       if (!toast || !toastMsg) return;
 
+      // 기존에 실행 중인 숨김 타이머가 있다면 취소하여 겹침 방지
+      if (toastTimer) clearTimeout(toastTimer);
+      
+      // 혹시 남아있을지 모르는 인라인 스타일 강제 초기화
+      toast.style.opacity = '';
+      toast.style.transform = '';
+
       toastMsg.textContent = message;
-      toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 flex items-center gap-2.5 px-5 py-3 rounded-2xl shadow-xl text-white text-sm font-bold transform translate-y-0 opacity-100 ${
+      toast.className = `fixed top-8 sm:top-12 left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 flex items-center gap-2.5 px-5 py-3 rounded-2xl shadow-xl text-white text-sm font-bold transform translate-y-0 opacity-100 ${
         type === "success" ? "bg-emerald-600" : type === "info" ? "bg-slate-800" : "bg-rose-600"
       }`;
 
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translate(-50%, 20px)';
-      }, 3000);
+      // 2.5초 후 다시 위로 올라가며 투명해지도록 처리
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("translate-y-0", "opacity-100");
+        toast.classList.add("-translate-y-10", "opacity-0", "pointer-events-none");
+      }, 2500);
     }
 
     async function fetchSheetGvizData(sheetName) {
