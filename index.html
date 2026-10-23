@@ -384,36 +384,7 @@
         </div>
       </div>
     </div>
-
-  <!-- 이미지 확대 뷰어 모달 -->
-  <div id="imageViewerModal" class="hidden fixed inset-0 z-[70] bg-black/95 backdrop-blur-sm opacity-0 transition-opacity duration-300 flex flex-col touch-none">
-    <div class="flex justify-end p-4 shrink-0">
-      <button id="closeImageViewerBtn" type="button" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer z-10">
-        <i data-lucide="x" class="w-6 h-6"></i>
-      </button>
-    </div>
-    <div class="flex-1 overflow-hidden flex items-center justify-center p-4 relative" id="imageViewerContainer">
-      <img id="viewerImage" src="" alt="확대된 지도" class="max-w-none origin-center transition-transform duration-100" style="width: 100%; max-width: 800px; object-fit: contain;">
-    </div>
-    <div class="p-5 text-center text-white/60 text-xs sm:text-sm shrink-0 font-medium tracking-tight">
-      두 손가락으로 확대/축소하거나 두 번 연속 터치하세요
-    </div>
   </div>
-
-  <!-- 포인트 사용 안내 모달 -->
-  <div id="couponsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
-    <div id="couponsModalContent" class="bg-white rounded-3xl shadow-2xl w-full max-w-[500px] flex flex-col transform scale-95 transition-transform duration-200 overflow-hidden border border-emerald-100 p-6 sm:p-7">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-          <div id="mapImageContainer" class="relative rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[200px] touch-none">
-            <img id="inlineMapImage" src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover transform scale-125 origin-center transition-transform duration-100">
-            <div class="absolute bottom-3 right-3 bg-white/80 backdrop-blur-sm px-2.5 py-1.5 rounded-lg shadow-sm text-[11px] text-slate-600 font-bold pointer-events-none flex items-center gap-1.5">
-              <i data-lucide="zoom-in" class="w-3.5 h-3.5 text-emerald-600"></i>
-              두 손가락으로 확대
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- 누락되었던 모달 닫기 태그 추가 및 미사용 코드 정리 -->
 
   <!-- 포인트 사용 안내 모달 -->
   <div id="couponsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
@@ -1527,9 +1498,10 @@
           if (currentScale < 1) currentScale = 1;
           if (currentScale > 4) currentScale = 4;
           
-          if (currentScale === 1) {
+          if (currentScale <= 1.25) {
             currentX = 0;
             currentY = 0;
+            currentScale = 1.25; // 기본 확대 배율 이하로 내려가지 않도록 강제
           }
 
           inlineMapImage.style.transition = animate ? 'transform 0.2s ease-out' : 'none';
@@ -1542,7 +1514,7 @@
 
         mapImageContainer.addEventListener('touchstart', (e) => {
           if (e.touches.length === 2) {
-            e.preventDefault(); // 스크롤 방지
+            e.preventDefault(); // 핀치 줌 시 화면 스크롤 방지
             isPinching = true;
             isDragging = false;
             initialDistance = getDistance(e.touches);
@@ -1555,10 +1527,13 @@
               e.preventDefault();
               currentScale = currentScale > 1.5 ? 1.25 : 2.5;
               updateTransform(true);
-            } else if (currentScale > 1) {
-              isDragging = true;
-              startX = e.touches[0].pageX - currentX;
-              startY = e.touches[0].pageY - currentY;
+            } else {
+              // 현재 배율이 기본(1.25)보다 클 때만 이미지 내 이동(드래그) 허용, 아니면 모달창 정상 스크롤 허용
+              if (currentScale > 1.25) {
+                isDragging = true;
+                startX = e.touches[0].pageX - currentX;
+                startY = e.touches[0].pageY - currentY;
+              }
             }
             lastTap = currentTime;
           }
@@ -1566,14 +1541,14 @@
 
         mapImageContainer.addEventListener('touchmove', (e) => {
           if (isPinching && e.touches.length === 2) {
-            e.preventDefault();
+            e.preventDefault(); // 줌 동작 중 화면 스크롤 방지
             const currentDistance = getDistance(e.touches);
             const scaleDiff = (currentDistance - initialDistance) * 0.015;
             currentScale += scaleDiff;
             initialDistance = currentDistance;
             updateTransform(false);
-          } else if (isDragging && e.touches.length === 1) {
-            e.preventDefault();
+          } else if (isDragging && e.touches.length === 1 && currentScale > 1.25) {
+            e.preventDefault(); // 드래그 중 화면 스크롤 방지
             currentX = e.touches[0].pageX - startX;
             currentY = e.touches[0].pageY - startY;
             updateTransform(false);
