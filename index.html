@@ -1440,9 +1440,9 @@
       const inlineMapImage = document.getElementById("inlineMapImage");
 
       if (mapImageContainer && inlineMapImage) {
-        let currentScale = 1.6; // 처음 팝업 띄웠을 때 1.6배로 약간 확대된 상태로 시작
-        let currentX = 0;
-        let currentY = 0;
+        let currentScale = 2.2; // 처음 팝업 띄웠을 때 2.2배로 기존(1.6)보다 더 확대된 상태로 시작
+        let currentX = -40;     // 가락초 방향으로 가로 중심 이동 (양수:오른쪽 이동, 음수:왼쪽 이동)
+        let currentY = 30;      // 가락초 방향으로 세로 중심 이동 (양수:아래로 이동, 음수:위로 이동)
         let startX = 0;
         let startY = 0;
         let initialDistance = 0;
@@ -1451,8 +1451,8 @@
         let lastTap = 0;
 
         // CSS의 scale 속성과 충돌을 막기 위해 JS로 초기 상태 할당
-        inlineMapImage.classList.remove('scale-125', 'scale-[1.6]');
-        inlineMapImage.style.transform = `translate(0px, 0px) scale(1.6)`;
+        inlineMapImage.classList.remove('scale-125', 'scale-[1.6]', 'scale-[2.2]');
+        inlineMapImage.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
 
         const updateTransform = (animate = false) => {
           if (currentScale < 1) currentScale = 1; // 최소 1배 축소까지 허용
@@ -1543,12 +1543,12 @@
           updateTransform(true);
         });
 
-        // 모달이 닫힐 때 지도 확대/이동 상태 1.6배 기본 화면으로 초기화
+        // 모달이 닫힐 때 지도 확대/이동 상태 기본 화면으로 초기화
         document.getElementById("closeStoreLocationModalBtn")?.addEventListener("click", () => {
           setTimeout(() => {
-            currentScale = 1.6; // 모달 닫을 때 1.6배로 리셋 설정
-            currentX = 0;
-            currentY = 0;
+            currentScale = 2.2; // 모달 닫을 때 2.2배로 리셋
+            currentX = -40;
+            currentY = 30;
             updateTransform(false);
           }, 300);
           
