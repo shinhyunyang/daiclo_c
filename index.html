@@ -1450,8 +1450,8 @@
       const inlineMapImage = document.getElementById("inlineMapImage");
 
       if (mapImageContainer && inlineMapImage) {
-        let currentScale = 2.2;
-        let currentX = -40;
+        let currentScale = 3.17;
+        let currentX = 40;
         let currentY = 30;
         let startX = 0;
         let startY = 0;
@@ -1460,7 +1460,7 @@
         let isPinching = false;
         let lastTap = 0;
 
-        inlineMapImage.classList.remove('scale-125', 'scale-[1.6]', 'scale-[2.2]');
+        inlineMapImage.classList.remove('scale-125', 'scale-[1.6]', 'scale-[2.2]', 'scale-[2.64]');
         inlineMapImage.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
 
         const updateTransform = (animate = false) => {
@@ -1549,8 +1549,8 @@
 
         document.getElementById("closeStoreLocationModalBtn")?.addEventListener("click", () => {
           setTimeout(() => {
-            currentScale = 2.2;
-            currentX = -40;
+            currentScale = 3.17;
+            currentX = 40;
             currentY = 30;
             updateTransform(false);
           }, 300);
