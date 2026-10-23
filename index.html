@@ -372,7 +372,7 @@
       </div>
       <div class="p-5 bg-slate-50/70 overflow-y-auto flex-1 space-y-4 text-sm text-slate-700">
         <div class="space-y-2">
-          <div><span class="font-bold text-slate-900">매장 위치 :</span> 서울 송파구 송파대로345 헬리오시티 제근린생활시설2b동 1019호</div>
+          <div><span class="font-bold text-slate-900">매장 위치 :</span> 서울 송파구 송파대로345 헬리오시티 제근린생활시설2b동 1019호(가락초 정문앞)</div>
           <div><span class="font-bold text-slate-900">주차 위치 :</span> 헬리오시티상가 2-A 주차장 이용 (무료)</div>
         </div>
         <div id="mapImageContainer" class="relative rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[350px] touch-none">
@@ -1431,7 +1431,7 @@
       const inlineMapImage = document.getElementById("inlineMapImage");
 
       if (mapImageContainer && inlineMapImage) {
-        let currentScale = 1.6; // 기본적으로 기존보다 더 확대된 상태(1.6배)로 시작
+        let currentScale = 1.6; // 처음 팝업 띄웠을 때 1.6배로 약간 확대된 상태로 시작
         let currentX = 0;
         let currentY = 0;
         let startX = 0;
@@ -1446,13 +1446,14 @@
         inlineMapImage.style.transform = `translate(0px, 0px) scale(1.6)`;
 
         const updateTransform = (animate = false) => {
-          if (currentScale < 1) currentScale = 1;
-          if (currentScale > 4) currentScale = 4;
+          if (currentScale < 1) currentScale = 1; // 최소 1배 축소까지 허용
+          if (currentScale > 4) currentScale = 4; // 최대 4배 확대
           
-          if (currentScale <= 1.6) {
+          // 완전히 1.0배로 축소했을 때만 화면 정중앙으로 강제 고정 (1.6배일 때는 이동 허용)
+          if (currentScale <= 1.0) {
             currentX = 0;
             currentY = 0;
-            currentScale = 1.6; // 기본 확대 배율 이하로 내려가지 않도록 강제
+            currentScale = 1.0; 
           }
 
           inlineMapImage.style.transition = animate ? 'transform 0.2s ease-out' : 'none';
@@ -1488,14 +1489,14 @@
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
             
-            // 더블 탭으로 줌 인/아웃
+            // 더블 탭으로 줌 인/아웃 (1.0배 기본 뷰와 2.5배 확대 뷰 사이 전환)
             if (tapLength < 300 && tapLength > 0) {
               e.preventDefault();
-              currentScale = currentScale > 2.0 ? 1.6 : 2.5;
+              currentScale = currentScale > 2.0 ? 1.0 : 2.5;
               updateTransform(true);
             } else {
-              // 현재 배율이 기본(1.6)보다 클 때만 이미지 내 이동(드래그) 허용, 아니면 모달창 정상 스크롤 허용
-              if (currentScale > 1.6) {
+              // 현재 배율이 1.0보다 클 때는 모두 이동(드래그) 허용 (기본 1.6배 상태 포함)
+              if (currentScale > 1.0) {
                 isDragging = true;
                 startX = e.touches[0].pageX - currentX;
                 startY = e.touches[0].pageY - currentY;
@@ -1513,7 +1514,7 @@
             currentScale += scaleDiff;
             initialDistance = currentDistance;
             updateTransform(false);
-          } else if (isDragging && e.touches.length === 1 && currentScale > 1.6) {
+          } else if (isDragging && e.touches.length === 1 && currentScale > 1.0) {
             e.preventDefault(); // 드래그 중 화면 스크롤 방지
             currentX = e.touches[0].pageX - startX;
             currentY = e.touches[0].pageY - startY;
@@ -1529,14 +1530,14 @@
         // PC 환경 더블 클릭 지원
         inlineMapImage.addEventListener('dblclick', (e) => {
           e.preventDefault();
-          currentScale = currentScale > 2.0 ? 1.6 : 2.5;
+          currentScale = currentScale > 2.0 ? 1.0 : 2.5;
           updateTransform(true);
         });
 
-        // 모달이 닫힐 때 지도 확대/이동 상태 초기화
+        // 모달이 닫힐 때 지도 확대/이동 상태 1.6배 기본 화면으로 초기화
         document.getElementById("closeStoreLocationModalBtn")?.addEventListener("click", () => {
           setTimeout(() => {
-            currentScale = 1.6;
+            currentScale = 1.6; // 모달 닫을 때 1.6배로 리셋 설정
             currentX = 0;
             currentY = 0;
             updateTransform(false);
@@ -1553,7 +1554,6 @@
         });
       }
 
-      // [사이드 드로어(햄버거) 메뉴 및 네비게이션 버튼 로직 복원]
       const sideMenuDrawerBackdrop = document.getElementById("sideMenuDrawerBackdrop");
       const sideMenuDrawer = document.getElementById("sideMenuDrawer");
 
