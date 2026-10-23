@@ -255,7 +255,49 @@
         <strong>숫자 5자리</strong> 비밀번호를 등록하세요.
       </p>
       
-      <input type="password" id="inputNewMemberPwd" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric" pattern="[0-9]*">
+      <input type="text" style="-webkit-text-security: disc;" id="inputNewMemberPwd" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric" pattern="[0-9]*">
+      
+      <div class="flex gap-2 justify-center">
+        <button id="cancelSetPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
+        <button id="confirmSetPwdBtn" type="button" class="flex-1 px-4 py-3 text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl transition-colors cursor-pointer">등록하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 비밀번호 확인 모달 -->
+  <div id="memberVerifyPwdModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-200 p-7 text-center border border-emerald-100" id="memberVerifyPwdModalContent">
+      <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="lock" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-xl font-extrabold text-slate-800 mb-1">비밀번호 확인</h3>
+      <p class="text-xs text-slate-600 mb-5 leading-relaxed">
+        <span id="targetNickVerifyText" class="font-bold text-emerald-700"></span> 님의 주문 조회를 위해<br>
+        설정하신 <strong>비밀번호</strong>를 입력해 주세요.
+      </p>
+      
+      <input type="text" style="-webkit-text-security: disc;" id="inputVerifyMemberPwd" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="•••••" maxlength="5" inputmode="numeric" pattern="[0-9]*">
+      
+      <div class="flex gap-2 justify-center">
+        <button id="cancelVerifyMemberPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
+        <button id="confirmVerifyMemberPwdBtn" type="button" class="flex-1 px-4 py-3 text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl transition-colors cursor-pointer">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 관리자 비밀번호 확인 모달 -->
+  <div id="adminVerifyPwdModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-200 p-7 text-center border border-emerald-100" id="adminVerifyPwdModalContent">
+      <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="shield-alert" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-xl font-extrabold text-slate-800 mb-1">관리자 확인</h3>
+      <p class="text-xs text-slate-600 mb-5 leading-relaxed">
+        DB 업데이트(새로고침)를 위해<br>
+        <strong>관리자 비밀번호</strong>를 입력해 주세요.
+      </p>
+      
+      <input type="text" style="-webkit-text-security: disc;" id="inputAdminPwd" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full border-2 border-emerald-200 bg-slate-50 rounded-xl p-3.5 text-center text-2xl tracking-[0.4em] font-mono focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors mb-5" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
       
       <div class="flex gap-2 justify-center">
         <button id="cancelSetPwdBtn" type="button" class="flex-1 px-4 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl transition-colors cursor-pointer">취소</button>
