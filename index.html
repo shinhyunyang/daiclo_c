@@ -379,7 +379,7 @@
           <div><span class="font-bold text-slate-900">주차 위치 :</span> 헬리오시티상가 2-A 주차장 이용 (무료)</div>
         </div>
         <div id="mapImageContainer" class="relative rounded-2xl overflow-hidden border border-emerald-100 shadow-sm bg-slate-100 flex items-center justify-center min-h-[350px] touch-none">
-          <img id="inlineMapImage" src="image_322464.png" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover origin-center transition-transform duration-100">
+          <img id="inlineMapImage" src="https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder" onerror="this.onerror=null; this.src='https://placehold.co/800x400/e2e8f0/475569?text=Map+Location+Placeholder'" alt="매장 위치 및 주차장 안내 지도" class="w-full h-auto object-cover origin-center transition-transform duration-100">
           
           <div class="absolute bottom-3 right-3 flex flex-col gap-2 z-10">
             <button id="zoomInBtn" type="button" aria-label="확대" class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-xl shadow-md flex items-center justify-center text-slate-700 hover:bg-slate-50 active:scale-95 transition-all border border-slate-200 cursor-pointer">
@@ -1196,9 +1196,21 @@
         const dateNumB = parseDateNum(b.orderDate);
 
         if (isCompleteA) {
-          return dateNumB - dateNumA;
+          // 완료건: 주문일 내림차순 -> 주문일 동일시 픽업일 오름차순
+          if (dateNumA !== dateNumB) {
+            return dateNumB - dateNumA;
+          }
+          const pickupNumA = parseDateNum(a.pickupDate);
+          const pickupNumB = parseDateNum(b.pickupDate);
+          return pickupNumA - pickupNumB;
         } else {
-          return dateNumA - dateNumB;
+          // 픽업예정건: 주문일 오름차순 -> 주문일 동일시 픽업일 오름차순
+          if (dateNumA !== dateNumB) {
+            return dateNumA - dateNumB;
+          }
+          const pickupNumA = parseDateNum(a.pickupDate);
+          const pickupNumB = parseDateNum(b.pickupDate);
+          return pickupNumA - pickupNumB;
         }
       });
 
@@ -1498,9 +1510,9 @@
       const inlineMapImage = document.getElementById("inlineMapImage");
 
       if (mapImageContainer && inlineMapImage) {
-        let currentScale = 3.17;
-        let currentX = 40;
-        let currentY = 30;
+        let currentScale = 1.0;
+        let currentX = 0;
+        let currentY = 0;
         let startX = 0;
         let startY = 0;
         let initialDistance = 0;
@@ -1596,9 +1608,9 @@
 
         document.getElementById("closeStoreLocationModalBtn")?.addEventListener("click", () => {
           setTimeout(() => {
-            currentScale = 3.17;
-            currentX = 40;
-            currentY = 30;
+            currentScale = 1.0;
+            currentX = 0;
+            currentY = 0;
             updateTransform(false);
           }, 300);
           
