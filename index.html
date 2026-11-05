@@ -95,16 +95,6 @@
       </div>
 
       <nav class="flex-1 p-4 space-y-3 overflow-y-auto">
-        <button id="navCouponsBtn" type="button" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-white text-slate-800 font-bold text-sm border border-slate-100 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200/60">
-              <i data-lucide="coins" class="w-4.5 h-4.5"></i>
-            </div>
-            <span>포인트 사용 안내</span>
-          </div>
-          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-        </button>
-
         <button id="navStoreLocationBtn" type="button" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-white text-slate-800 font-bold text-sm border border-slate-100 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center border border-slate-200/60">
@@ -161,19 +151,6 @@
             <i data-lucide="search" class="w-4.5 h-4.5 stroke-[2.5]"></i>
             <span>조회</span>
           </button>
-        </div>
-
-        <!-- 보유 포인트 표시 영역 -->
-        <div id="userPointInfoContainer" class="hidden mt-2 pt-1.5 flex items-center justify-between px-4 py-2.5 bg-white/20 rounded-xl text-white font-extrabold text-base sm:text-lg select-none backdrop-blur-xs">
-          <span id="userPointDisplayLabel">포인트 : 0P</span>
-          <div class="flex items-center gap-1.5 shrink-0">
-            <button id="openPointHistoryModalBtn" type="button" class="shrink-0 px-3 py-1.5 bg-white hover:bg-emerald-50 text-[#278b4e] active:scale-95 text-xs sm:text-sm font-extrabold rounded-lg shadow-sm border border-transparent transition-all cursor-pointer">
-              적립/사용
-            </button>
-            <button id="openUsePointModalBtn" type="button" class="shrink-0 px-3 py-1.5 bg-white text-[#278b4e] hover:bg-emerald-50 active:scale-95 text-xs sm:text-sm font-extrabold rounded-lg shadow-sm border border-transparent transition-all cursor-pointer">
-              사용안내
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -312,56 +289,6 @@
     </div>
   </div>
 
-  <!-- 포인트 적립/사용 이력 모달 -->
-  <div id="pointHistoryModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
-    <div id="pointHistoryModalContent" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col transform scale-95 transition-transform duration-200 overflow-hidden border border-emerald-100">
-      <div class="px-5 py-4 border-b border-emerald-100 flex items-center justify-between bg-white shrink-0">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/60">
-            <i data-lucide="history" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-extrabold text-slate-800 tracking-tight">포인트 적립/사용 내역</h3>
-            <p class="text-xs text-slate-500 font-medium"><span id="pointHistoryModalNickText" class="font-bold text-emerald-700"></span> 님의 내역</p>
-          </div>
-        </div>
-        <button id="closePointHistoryModalBtn" type="button" aria-label="닫기" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <!-- 상단 요약 바 -->
-      <div class="px-5 py-3 bg-emerald-50/70 border-b border-emerald-100 flex items-center justify-between shrink-0 text-xs sm:text-sm">
-        <div class="flex items-center gap-3">
-          <span class="text-slate-600 font-medium">총 적립: <b id="historyTotalEarnedText" class="text-emerald-700 font-extrabold">0P</b></span>
-          <span class="text-slate-300">|</span>
-          <span class="text-slate-600 font-medium">총 사용: <b id="historyTotalUsedText" class="text-rose-600 font-extrabold">0P</b></span>
-        </div>
-        <div>
-          <span class="text-slate-700 font-medium">현재 잔액: <b id="historyBalanceText" class="text-emerald-900 font-extrabold">0P</b></span>
-        </div>
-      </div>
-
-      <!-- 내역 리스트 컨테이너 -->
-      <div class="p-4 sm:p-5 overflow-y-auto flex-1 bg-slate-50/50">
-        <div id="pointHistoryListContainer" class="space-y-2.5"></div>
-
-        <div id="pointHistoryEmptyState" class="hidden py-12 flex flex-col items-center justify-center text-center text-slate-400">
-          <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mb-2.5 text-slate-400">
-            <i data-lucide="inbox" class="w-6 h-6"></i>
-          </div>
-          <p class="text-sm font-bold text-slate-600">포인트 적립 및 사용 이력이 없습니다</p>
-        </div>
-      </div>
-
-      <div class="p-3.5 border-t border-slate-100 bg-white shrink-0">
-        <button id="confirmPointHistoryModalBtn" type="button" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white rounded-xl text-sm font-extrabold shadow-sm transition-all cursor-pointer">
-          확인
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- 매장 위치 및 주차안내 모달 -->
   <div id="storeLocationModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
     <div id="storeLocationModalContent" class="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[85vh] flex flex-col transform scale-95 transition-transform duration-200 overflow-hidden border border-emerald-100">
@@ -397,46 +324,6 @@
     </div>
   </div>
 
-  <!-- 포인트 사용 안내 모달 -->
-  <div id="couponsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-200">
-    <div id="couponsModalContent" class="bg-white rounded-3xl shadow-2xl w-full max-w-[500px] flex flex-col transform scale-95 transition-transform duration-200 overflow-hidden border border-emerald-100 p-6 sm:p-7">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200">
-            <i data-lucide="coins" class="w-5 h-5"></i>
-          </div>
-          <h3 class="text-xl font-extrabold text-slate-800">포인트 사용 안내</h3>
-        </div>
-        <button id="closeCouponsIconBtn" type="button" aria-label="닫기" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      
-      <div class="py-6 space-y-4 text-left text-slate-700 text-[14.4px] sm:text-[16.2px]">
-        <div class="flex items-start gap-3">
-          <span class="font-extrabold text-amber-600 shrink-0 text-[18px] leading-relaxed">-</span>
-          <span class="font-medium leading-relaxed">포인트 사용은 <strong class="text-slate-900 font-bold">직원에게 제시하여 사용 가능</strong>합니다.<br><span class="text-[12.6px] sm:text-[14.4px] text-rose-500 font-semibold">(무인 운영 시간 사용 불가)</span></span>
-        </div>
-        <div class="flex items-start gap-3">
-          <span class="font-extrabold text-amber-600 shrink-0 text-[18px] leading-relaxed">-</span>
-          <span class="font-medium leading-relaxed"><strong class="text-slate-900 font-bold">1,000P 단위</strong>로 사용 가능하며, 1회 최대 <strong class="text-slate-900 font-bold">10,000P</strong> 까지 사용 가능합니다.<br><span class="text-[12.6px] sm:text-[14.4px] text-slate-500 font-semibold">(1,000P = 1,000원 할인)</span></span>
-        </div>
-        <div class="flex items-start gap-3">
-          <span class="font-extrabold text-amber-600 shrink-0 text-[18px] leading-relaxed">-</span>
-          <span class="font-medium leading-relaxed"><strong class="text-slate-900 font-bold">링크주문서의 포인트와 동시 사용이 불가</strong>합니다.</span>
-        </div>
-        <div class="flex items-start gap-3">
-          <span class="font-extrabold text-amber-600 shrink-0 text-[18px] leading-relaxed">-</span>
-          <span class="font-medium leading-relaxed">포인트의 유효 기간은 <strong class="text-slate-900 font-bold">발급 후 1년</strong>이며, 1년이 지난 포인트는 <strong class="text-rose-600 font-bold">자동 삭제</strong>됩니다.</span>
-        </div>
-      </div>
-
-      <button id="closeCouponsModalBtn" type="button" class="w-full py-3.5 bg-[#34a862] hover:bg-[#2b9454] active:scale-98 text-white rounded-xl text-base font-extrabold shadow-md transition-all cursor-pointer">
-        확인
-      </button>
-    </div>
-  </div>
-
   <!-- 토스트 알림창 -->
   <div id="toastNotification" class="fixed top-8 sm:top-12 left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 flex items-center gap-2.5 px-5 py-3 rounded-2xl shadow-xl text-white text-sm font-bold bg-emerald-600 transform -translate-y-10 opacity-0 pointer-events-none">
     <span id="toastMessage"></span>
@@ -460,8 +347,6 @@
     let ordersData = [...SAMPLE_INITIAL_ORDERS];
     let memberPasswordMap = {};
     let localSetPasswordTime = {};
-    let memberPointsMap = {};
-    let memberPointHistoryMap = {};
     let searchQuery = "";
     let activeSelectedNickname = "";
     let multiNicknameChoices = [];
@@ -590,137 +475,6 @@
       }
     }
 
-    async function loadPointsFromSheet() {
-      try {
-        let data = await fetchSheetGvizData("포인트");
-        if (!data || !data.table || !data.table.rows || data.table.rows.length === 0) {
-          data = await fetchSheetGvizData("포인트 ");
-        }
-
-        memberPointsMap = {};
-        memberPointHistoryMap = {};
-        
-        if (data && data.table && data.table.rows) {
-          const matrix = data.table.rows.map(row => (row.c || []).map(c => {
-            if (!c) return "";
-            if (c.f !== undefined && c.f !== null) return String(c.f);
-            if (c.v !== undefined && c.v !== null) return String(c.v);
-            return "";
-          }));
-
-          const parsePointNum = (val) => {
-            if (val === null || val === undefined) return 0;
-            const strVal = String(val).trim();
-            if (!strVal || strVal === "-") return 0;
-            const cleaned = strVal.replace(/[^0-9\-]/g, "");
-            if (!cleaned || cleaned === "-") return 0;
-            const n = parseInt(cleaned, 10);
-            return isNaN(n) ? 0 : n;
-          };
-
-          if (matrix.length > 0) {
-            let headerRowIndex = -1;
-            let colDate = 0;
-            let colNickname = 1;
-            let colEarn = 2;
-            let colEarnDesc = 3;
-            let colUse = 4;
-            let colUseDesc = 5;
-
-            for (let i = 0; i < Math.min(matrix.length, 5); i++) {
-              const row = matrix[i] || [];
-              let foundHeader = false;
-              row.forEach((colVal, cIdx) => {
-                const headerText = String(colVal || "").replace(/\s+/g, "").toLowerCase();
-                
-                if (headerText.includes("날짜") || headerText.includes("일자")) {
-                  colDate = cIdx;
-                }
-                if (headerText.includes("닉네임") || headerText === "회원" || headerText === "고객명") {
-                  colNickname = cIdx;
-                  foundHeader = true;
-                }
-                if (headerText.includes("포인트적립") || (headerText.includes("적립") && !headerText.includes("내역"))) {
-                  colEarn = cIdx;
-                  foundHeader = true;
-                }
-                if (headerText.includes("적립내역")) {
-                  colEarnDesc = cIdx;
-                }
-                if (headerText.includes("포인트사용") || (headerText.includes("사용") && !headerText.includes("내역") && !headerText.includes("구분"))) {
-                  colUse = cIdx;
-                  foundHeader = true;
-                }
-                if (headerText.includes("사용내역") || headerText.includes("사용구분")) {
-                  colUseDesc = cIdx;
-                }
-              });
-              if (foundHeader) {
-                headerRowIndex = i;
-                break;
-              }
-            }
-
-            const startRow = headerRowIndex >= 0 ? headerRowIndex + 1 : 0;
-            const totalEarnedMap = {};
-            const totalUsedMap = {};
-
-            for (let i = startRow; i < matrix.length; i++) {
-              const row = matrix[i];
-              if (!row || row.length === 0) continue;
-              
-              const rawNick = row[colNickname];
-              if (!rawNick) continue;
-              const nickKey = String(rawNick).trim();
-              if (!nickKey) continue;
-
-              const dateVal = row[colDate] ? String(row[colDate]).trim() : "-";
-              const earnAmount = colEarn !== -1 && row[colEarn] !== undefined ? Math.abs(parsePointNum(row[colEarn])) : 0;
-              const useAmount = colUse !== -1 && row[colUse] !== undefined ? Math.abs(parsePointNum(row[colUse])) : 0;
-              const earnDesc = colEarnDesc !== -1 && row[colEarnDesc] !== undefined ? String(row[colEarnDesc]).trim() : "";
-              const useDesc = colUseDesc !== -1 && row[colUseDesc] !== undefined ? String(row[colUseDesc]).trim() : "";
-
-              totalEarnedMap[nickKey] = (totalEarnedMap[nickKey] || 0) + earnAmount;
-              totalUsedMap[nickKey] = (totalUsedMap[nickKey] || 0) + useAmount;
-
-              if (!memberPointHistoryMap[nickKey]) {
-                memberPointHistoryMap[nickKey] = [];
-              }
-
-              if (earnAmount > 0) {
-                memberPointHistoryMap[nickKey].push({
-                  rowIndex: i,
-                  date: dateVal,
-                  type: '적립',
-                  amount: earnAmount,
-                  description: earnDesc || '포인트 적립'
-                });
-              }
-
-              if (useAmount > 0) {
-                memberPointHistoryMap[nickKey].push({
-                  rowIndex: i,
-                  date: dateVal,
-                  type: '사용',
-                  amount: useAmount,
-                  description: useDesc || '포인트 사용'
-                });
-              }
-            }
-
-            const allNicks = new Set([...Object.keys(totalEarnedMap), ...Object.keys(totalUsedMap)]);
-            allNicks.forEach((nick) => {
-              const earnedTotal = totalEarnedMap[nick] || 0;
-              const usedTotal = totalUsedMap[nick] || 0;
-              memberPointsMap[nick] = earnedTotal - usedTotal;
-            });
-          }
-        }
-      } catch (err) {
-        console.warn("포인트 탭 로드 및 계산 중 오류:", err);
-      }
-    }
-
     function processRawMatrix(matrix) {
       if (!matrix || matrix.length === 0) return [];
       let headerRowIndex = -1;
@@ -776,10 +530,7 @@
     async function loadGoogleSheetData(isSilent = false) {
       if (!isSilent) showToast("데이터 갱신 중...", "info");
       
-      await Promise.all([
-        loadMembersFromSheet(),
-        loadPointsFromSheet()
-      ]);
+      await loadMembersFromSheet();
 
       const fetchedData = await fetchSheetGvizData("주문데이터");
       if (fetchedData && fetchedData.table && fetchedData.table.rows) {
@@ -977,17 +728,6 @@
       const clearBtn = document.getElementById("clearSearchBtn");
       if (clearBtn) clearBtn.classList.remove("hidden");
 
-      const pointContainer = document.getElementById("userPointInfoContainer");
-      const pointDisplayLabel = document.getElementById("userPointDisplayLabel");
-      
-      const exactNickKey = nick.trim();
-      const pointValue = memberPointsMap[exactNickKey] !== undefined ? memberPointsMap[exactNickKey] : 0;
-      
-      if (pointContainer && pointDisplayLabel) {
-        pointDisplayLabel.textContent = `포인트 : ${Number(pointValue).toLocaleString()}P`;
-        pointContainer.classList.remove("hidden");
-      }
-
       render();
     }
 
@@ -1003,113 +743,7 @@
       const clearBtn = document.getElementById("clearSearchBtn");
       if (clearBtn) clearBtn.classList.add("hidden");
 
-      const pointContainer = document.getElementById("userPointInfoContainer");
-      if (pointContainer) pointContainer.classList.add("hidden");
-
       render();
-    }
-
-    function openPointHistoryModal() {
-      if (!activeSelectedNickname) {
-        showToast("조회된 닉네임이 없습니다.", "error");
-        return;
-      }
-
-      const modal = document.getElementById("pointHistoryModal");
-      const modalContent = document.getElementById("pointHistoryModalContent");
-      const nickText = document.getElementById("pointHistoryModalNickText");
-      const listContainer = document.getElementById("pointHistoryListContainer");
-      const emptyState = document.getElementById("pointHistoryEmptyState");
-      const totalEarnedText = document.getElementById("historyTotalEarnedText");
-      const totalUsedText = document.getElementById("historyTotalUsedText");
-      const balanceText = document.getElementById("historyBalanceText");
-
-      if (!modal || !modalContent || !listContainer) return;
-
-      const exactNickKey = activeSelectedNickname.trim();
-      if (nickText) nickText.textContent = exactNickKey;
-
-      const histories = memberPointHistoryMap[exactNickKey] ? [...memberPointHistoryMap[exactNickKey]] : [];
-
-      const parseDateVal = (dStr) => {
-        if (!dStr || dStr === "-") return 0;
-        const cleaned = String(dStr).replace(/[^0-9]/g, "");
-        return parseInt(cleaned, 10) || 0;
-      };
-
-      histories.sort((a, b) => {
-        const da = parseDateVal(a.date);
-        const db = parseDateVal(db?.date || 0);
-        if (da !== db) return db - da;
-        return (b.rowIndex || 0) - (a.rowIndex || 0);
-      });
-
-      let totalEarned = 0;
-      let totalUsed = 0;
-      histories.forEach(h => {
-        if (h.type === '적립') totalEarned += h.amount;
-        if (h.type === '사용') totalUsed += h.amount;
-      });
-
-      const currentBalance = totalEarned - totalUsed;
-
-      if (totalEarnedText) totalEarnedText.textContent = `+${Number(totalEarned).toLocaleString()}P`;
-      if (totalUsedText) totalUsedText.textContent = `-${Number(totalUsed).toLocaleString()}P`;
-      if (balanceText) balanceText.textContent = `${Number(currentBalance).toLocaleString()}P`;
-
-      listContainer.innerHTML = "";
-
-      if (histories.length === 0) {
-        emptyState?.classList.remove("hidden");
-      } else {
-        emptyState?.classList.add("hidden");
-
-        histories.forEach(item => {
-          const isEarn = item.type === '적립';
-          const card = document.createElement("div");
-          card.className = `py-2 px-3 rounded-xl bg-white border ${isEarn ? 'border-emerald-100/90' : 'border-rose-100/90'} shadow-2xs flex items-center justify-between gap-2.5`;
-
-          card.innerHTML = `
-            <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-7 h-7 rounded-lg ${isEarn ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/50' : 'bg-rose-50 text-rose-600 border border-rose-200/50'} flex items-center justify-center shrink-0">
-                <i data-lucide="${isEarn ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4 h-4 stroke-[2.5]"></i>
-              </div>
-              <div class="min-w-0">
-                <div class="flex items-center gap-1.5">
-                  <span class="px-1.5 py-[1px] rounded text-[10px] font-extrabold ${isEarn ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                    ${isEarn ? '적립' : '사용'}
-                  </span>
-                  <span class="text-xs font-bold text-slate-800 truncate">${escapeHtml(item.description || (isEarn ? '포인트 적립' : '포인트 사용'))}</span>
-                </div>
-                <div class="text-[10px] font-mono text-slate-400 mt-[1px]">${escapeHtml(item.date || "-")}</div>
-              </div>
-            </div>
-            <div class="shrink-0 text-right">
-              <span class="font-extrabold font-mono text-sm ${isEarn ? 'text-emerald-600' : 'text-rose-600'}">
-                ${isEarn ? '+' : '-'}${Number(item.amount).toLocaleString()}P
-              </span>
-            </div>
-          `;
-
-          listContainer.appendChild(card);
-        });
-      }
-
-      if (window.lucide) lucide.createIcons();
-
-      modal.classList.remove("hidden");
-      void modal.offsetWidth;
-      modal.classList.remove("opacity-0", "pointer-events-none");
-      modalContent.classList.remove("scale-95");
-    }
-
-    function closePointHistoryModal() {
-      const modal = document.getElementById("pointHistoryModal");
-      const modalContent = document.getElementById("pointHistoryModalContent");
-      if (!modal || !modalContent) return;
-      modal.classList.add("opacity-0", "pointer-events-none");
-      modalContent.classList.add("scale-95");
-      setTimeout(() => modal.classList.add("hidden"), 200);
     }
 
     function executeNicknameSearch() {
@@ -1132,8 +766,6 @@
 
       if (matching.length === 0) {
         activeSelectedNickname = "";
-        const pointContainer = document.getElementById("userPointInfoContainer");
-        if (pointContainer) pointContainer.classList.add("hidden");
         render();
         showToast("일치하는 닉네임이 없습니다. 다시 입력해 주세요.", "error");
       } else {
@@ -1313,34 +945,6 @@
       }
       document.getElementById("clearSearchBtn")?.addEventListener("click", clearSelectedNickname);
       document.getElementById("closeNicknameSelectBtn")?.addEventListener("click", closeNicknameSelectModal);
-
-      document.getElementById("openPointHistoryModalBtn")?.addEventListener("click", openPointHistoryModal);
-      document.getElementById("closePointHistoryModalBtn")?.addEventListener("click", closePointHistoryModal);
-      document.getElementById("confirmPointHistoryModalBtn")?.addEventListener("click", closePointHistoryModal);
-
-      const openCouponsModal = () => {
-        const couponsModal = document.getElementById("couponsModal");
-        const couponsModalContent = document.getElementById("couponsModalContent");
-        if (!couponsModal || !couponsModalContent) return;
-        couponsModal.classList.remove("hidden");
-        void couponsModal.offsetWidth;
-        couponsModal.classList.remove("opacity-0", "pointer-events-none");
-        couponsModalContent.classList.remove("scale-95");
-        if (window.lucide) lucide.createIcons();
-      };
-
-      const closeCouponsModal = () => {
-        const couponsModal = document.getElementById("couponsModal");
-        const couponsModalContent = document.getElementById("couponsModalContent");
-        if (!couponsModal || !couponsModalContent) return;
-        couponsModal.classList.add("opacity-0", "pointer-events-none");
-        couponsModalContent.classList.add("scale-95");
-        setTimeout(() => couponsModal.classList.add("hidden"), 200);
-      };
-
-      document.getElementById("openUsePointModalBtn")?.addEventListener("click", openCouponsModal);
-      document.getElementById("closeCouponsModalBtn")?.addEventListener("click", closeCouponsModal);
-      document.getElementById("closeCouponsIconBtn")?.addEventListener("click", closeCouponsModal);
 
       document.getElementById("cancelSetPwdBtn")?.addEventListener("click", closeMemberSetPwdModal);
       
@@ -1619,7 +1223,6 @@
           }
         });
 
-        // 전역 접근 가능하도록 맵 초기화 함수 등록
         window.resetStoreMapToCenterZoom = resetMapToCenterZoom;
       }
 
@@ -1659,19 +1262,6 @@
           void storeModal.offsetWidth;
           storeModal.classList.remove("opacity-0", "pointer-events-none");
           storeModalContent.classList.remove("scale-95");
-        }
-      });
-
-      document.getElementById("navCouponsBtn")?.addEventListener("click", () => {
-        closeSideMenu();
-        const couponsModal = document.getElementById("couponsModal");
-        const couponsModalContent = document.getElementById("couponsModalContent");
-        if (couponsModal && couponsModalContent) {
-          couponsModal.classList.remove("hidden");
-          void couponsModal.offsetWidth;
-          couponsModal.classList.remove("opacity-0", "pointer-events-none");
-          couponsModalContent.classList.remove("scale-95");
-          if (window.lucide) lucide.createIcons();
         }
       });
 
